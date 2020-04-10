@@ -4,21 +4,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #include "server.h"
+
+
 
 int main()
 {
 
-    //Creating 5 threads for servers
-    pthread_t thread[5];
-    for (int i = 0; i < 5; i++)
-    {
-        pthread_create (&thread[i], NULL, serverStart, NULL);
-    }
+    //Creating thread for server
+    pthread_t thread;
+    pthread_create (&thread, NULL, serverStart, NULL);
+    pthread_join(thread, NULL);
 
-    //Joining threads
-    for (int i = 0; i < 5; i++)
-    {
-        pthread_join(thread[i], NULL);
-    }
+
+    return 0;
 }
