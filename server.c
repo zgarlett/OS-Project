@@ -29,7 +29,7 @@ void* serverStart(void *vargs)
 	serverAddr.sin_port = htons(8080);
 	serverAddr.sin_addr.s_addr = htons(INADDR_ANY);
 
-    if((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0 ){
+    if((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0 ){
         perror("Error creating socket\n");
 
     } else {
@@ -49,6 +49,7 @@ void* serverStart(void *vargs)
     } else {
         printf("Listening for connections\n");
     }
+    while
 
     return NULL;
 
