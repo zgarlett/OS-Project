@@ -49,8 +49,6 @@ void* serverStart(void *vargs)
     } else {
         printf("Listening for connections\n");
     }
-    while
 
     return NULL;
-
 }
