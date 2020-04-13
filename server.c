@@ -1,12 +1,8 @@
 //Operating Systems
 //Group K
 //3/30
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
+
+#include "server.h"
 
 
 struct client{
@@ -18,18 +14,18 @@ struct client{
 
 };
 
-
 void* serverStart(void *vargs)
 {
     int serverSocket;
 
-	struct sockaddr_in serverAddr;
+	struct sockaddr_in serverAddr, cli_addr;
+    socklen_t sin_size;
 
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(8080);
 	serverAddr.sin_addr.s_addr = htons(INADDR_ANY);
 
-    if((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0 ){
+    if((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0 ){
         perror("Error creating socket\n");
 
     } else {
@@ -50,5 +46,21 @@ void* serverStart(void *vargs)
         printf("Listening for connections\n");
     }
 
+    //Infinitely accept connections while running.
+    while (1)
+    {
+        //Socket for client
+        int clientfd;
+        struct sockaddr_in client_addr;
+        int addrlen=sizeof(client_addr);
+
+        //Accept incoming client connections.
+        clientfd = accept(serverSocket, (struct sockaddr*)&client_addr, &addrlen);
+
+        //Close connection with client.
+        close(clientfd);
+    }
+    close(serverSocket);
     return NULL;
+
 }
