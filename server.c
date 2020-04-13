@@ -55,7 +55,7 @@ void* serverStart(void *vargs)
         int addrlen=sizeof(client_addr);
 
         //Accept incoming client connections.
-        clientfd = accept(serverSocket, (struct sockaddr*)&client_addr, &addrlen);
+        clientfd = accept(serverSocket, (struct sockaddr*)&client_addr,(socklen_t *) &addrlen);
 
         //Close connection with client.
         close(clientfd);
