@@ -1,51 +1,93 @@
 #include <stdio.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <stdlib.h>
-//Define port to check for server connection.
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #define PORT 8080
 
-void connectToServer()
-{
-    //Initialize some variables and the message client replies back to server with.
-    int sock = 0;
-    struct sockaddr_in serv_addr;
+int mainclient(){
 
-    //Create a socket for the client.
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Socket creation error \n");
+    int clientSocket, ret;
+    struct sockaddr_in serverAddr;
+    char buffer[1024];
+
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if(clientSocket < 0){
+        printf("Error while connecting to server.\n");
+        exit(1);
     }
+    printf("Client socket has been opened.\n");
 
-    //Set some properties of the server address we are connecting to.
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    memset(&serverAddr, '\0', sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // Convert IP address to binary.
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
-    {
-        printf("\nInvalid address/ Address not supported \n");
+    ret = connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    if(ret < 0){
+        printf("Error when connecting to server (server may not be running?)\n");
+        exit(1);
     }
+    printf("Connected to server successfully, please input whether this client is a buyer or seller.\n");
+    printf("You may type 'exit' to end the connection at any time.");
 
-    //Connect to our server socket.
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-    }
-    else
-        {
-            printf("\nConnection success.\n");
+    //Send and receive loop
+    while(1){
+        printf("Input: \t");
+        scanf("%s", &buffer[0]);
+        send(clientSocket, buffer, strlen(buffer), 0);
+
+        //When we send out exit, we go ahead and close the socket and exit, server will respond and close its connection with the client as well.
+        if(strcmp(buffer, "exit") == 0){
+            close(clientSocket);
+            printf("Disconnected from server.\n");
+            exit(1);
         }
-    exit(0);
-}
 
-int main(int argc, char const *argv[])
-{
-    connectToServer();
+        if(recv(clientSocket, buffer, 1024, 0) < 0){
+            printf("Error in receiving data.\n");
+        }
+
+        //Take in Item info and List
+        if(strcmp((recv(clientSocket, buffer, 1024, 0)), "list") == 0){
+
+            char tempchar[50];
+
+            printf("Input bidID of item.\n");
+            scanf("%s", tempchar);
+            send(clientSocket, tempchar, strlen(tempchar), 0);
+
+            printf("Input name of item.\n");
+            scanf("%s", tempchar);
+            send(clientSocket, tempchar, strlen(tempchar), 0);
+
+            printf("Input quantity of item.\n");
+            scanf("%s", tempchar);
+            send(clientSocket, tempchar, strlen(tempchar), 0);
+
+            printf("Input starting bid of item.\n");
+            scanf("%s", tempchar);
+            send(clientSocket, tempchar, strlen(tempchar), 0);
+
+            printf("Input the end date of bidding for item. MM/DD/YYYY\n");
+            scanf("%s", tempchar);
+            send(clientSocket, tempchar, strlen(tempchar), 0);
+
+            printf("Input the merchant onformation for item.\n");
+            scanf("%s", tempchar);
+            send(clientSocket, tempchar, strlen(tempchar), 0);
+
+
+        }
+        else
+            {
+            printf("Server: \t%s\n", buffer);
+        }
+    }
 
     return 0;
 }
