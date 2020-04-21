@@ -8,7 +8,7 @@ For testing purposes I choose to divide the servers into 4 different files so th
 
 ### Requirements
 
-For this type of IPC it needs to be run in linux.. or maybe windows but I haven' test that.
+For this type of IPC it needs to be run on a linux machine.. or maybe windows but I haven' test that.
 
 Also to compile the servers you need to use specific commands
 
