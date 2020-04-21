@@ -4,7 +4,7 @@
 
 ## Explanation
 
-For testing purposes I choose to divide the servers into 4 different files so they could easily be executed in a command line. But I wrote them in such a way that they can be just copy and pasted into one file without having to be rewritten.
+For testing purposes I choose to divide the servers into 4 different files so they could easily be executed in a command line. But I wrote them in such a way that you can just copy and paste them into one file without having to be rewrite anything.
 
 ### Requirements
 
