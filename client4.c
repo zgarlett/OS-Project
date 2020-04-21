@@ -7,13 +7,26 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 //Define port to check for server connection.
-#define PORT 8080
+#define PORT 8184
 
-void connectToServer()
-{
+void connectToServer();
+
+char buffer[1024];
+char answer[1024];
+
+int main(int argc, char const *argv[]){
+
+    connectToServer();
+
+    return 0;
+}
+
+void connectToServer(){
     //Initialize some variables and the message client replies back to server with.
     int sock = 0;
+    int readVal;
     struct sockaddr_in serv_addr;
+
 
     //Create a socket for the client.
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -37,15 +50,12 @@ void connectToServer()
         printf("\nConnection Failed \n");
     }
     else
-        {
-            printf("\nConnection success.\n");
-        }
+    {
+        printf("\nConnection success.\n");
+        readVal = read(sock, buffer, 1024);
+        printf("%s\n",buffer);
+        scanf("%s", answer);
+        send(sock, answer ,strlen(answer),0);
+    }
     exit(0);
-}
-
-int main(int argc, char const *argv[])
-{
-    connectToServer();
-
-    return 0;
 }
