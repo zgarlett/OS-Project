@@ -241,3 +241,92 @@ int check_add_or_remove(){
 			}
 		}
 }
+
+void * acceptConnections(void * vargs){
+
+  char * ask = "Input Test: ";
+  char buffer[1024];
+  int servSock = *(int*) vargs;
+
+  printf("Waiting for connections on Server %d...\n", serverNumber);
+
+  int clientfd,val;
+  while (clientfd = accept(servSock,NULL,NULL)){
+
+
+      //Accept incoming client connections.
+      printf("Connected to Server %d!\n",serverNumber);
+
+
+      send(clientfd, ask , strlen(ask), 0);
+      val = recv(clientfd, buffer, 1024,0);
+      printf("Messge from Client: %s\n", buffer);
+
+
+      sendMessageToServers(buffer);
+      bzero(buffer,1024);
+  }
+  close(servSock);
+}
+
+void * listenMessageServer(void * vargs){
+
+    mqd_t server1,server2,server3,server4;
+    int portNum = *(int *) vargs;
+    char in_buffer[MSG_BUFFER_SIZE];
+
+    if(portNum == 8181){
+      server1 = mq_open(QUEUE_SERVER1, O_RDONLY);
+      while(1){
+        if(mq_receive (server1, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
+          printf("Port %d recieved: %s\n", portNum, in_buffer);
+        }
+      }
+    }
+    if(portNum == 8182){
+      server2 = mq_open(QUEUE_SERVER2, O_RDONLY);
+      while(1){
+        if(mq_receive (server2, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
+          printf("Port %d recieved: %s\n", portNum, in_buffer);
+        }
+      }
+    }
+    if(portNum == 8183){
+      server3 = mq_open(QUEUE_SERVER3, O_RDONLY);
+      while(1){
+        if(mq_receive (server3, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
+          printf("Port %d recieved: %s\n", portNum, in_buffer);
+        }
+      }
+    }
+    if(portNum == 8184){
+      server4 = mq_open(QUEUE_SERVER4, O_RDONLY);
+      while(1){
+        if(mq_receive (server4, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
+          printf("Port %d recieved: %s\n", portNum, in_buffer);
+        }
+      }
+    }
+}
+
+void sendMessageToServers(char * message){
+
+  mqd_t server1,server2, server3,server4;
+  struct mq_attr attr;
+
+  attr.mq_flags = 0;
+  attr.mq_maxmsg = MAX_MESSAGES;
+  attr.mq_msgsize = MAX_MSG_SIZE;
+  attr.mq_curmsgs = 0;
+
+  server1 = mq_open (QUEUE_SERVER1, O_WRONLY | O_CREAT, PERMISSIONS, &attr);
+  server2 = mq_open (QUEUE_SERVER2, O_WRONLY | O_CREAT, PERMISSIONS, &attr);
+  server3 = mq_open (QUEUE_SERVER3, O_WRONLY | O_CREAT, PERMISSIONS, &attr);
+  server4 = mq_open (QUEUE_SERVER4, O_WRONLY | O_CREAT, PERMISSIONS, &attr);
+
+  mq_send (server1, message, strlen (message) + 1, 0);
+  mq_send (server2, message, strlen (message) + 1, 0);
+  mq_send (server3, message, strlen (message) + 1, 0);
+  mq_send (server4, message, strlen (message) + 1, 0);
+
+}
