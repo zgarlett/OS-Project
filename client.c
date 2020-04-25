@@ -40,7 +40,7 @@ void connectToServer(){
 
     while(connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
 	{
-		serv_addr.sin_port = htons(ports[++portPosition]);
+		serverAddr.sin_port = htons(ports[++portPosition]);
 		printf("Trying next service center\n");
 		if(portPosition > 3)
 		{
@@ -103,6 +103,4 @@ void connectToServer(){
             printf("Server: \t%s\n", buffer);
         }
     }
-
-    return 0;
 }
