@@ -23,4 +23,20 @@ struct client{
 
 };
 
+//Begins a server that accepts bids and other commands.ß
 void* serverStart(void *vargs);
+
+//Checks if a char array is numbers or not
+int isNumeric (const char * s);
+
+//Other functions that will be needed but are not implemented quite yet.
+//Processing a bid using the item name and bid amount, return statement will indicate success or fail.
+int processBid(char itemName[16], float bidAmount);
+
+//Process an item removal, may need to take in seller ID as well?
+//return statement will indicate success or fail
+int processRemoval(char itemName[16]);
+
+//Send receipt to all clients, not sure what arguments this will need yet.
+void sendReceipt();
+

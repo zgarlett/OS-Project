@@ -2,7 +2,7 @@
 #include "ctype.h"
 #define PORT 8080
 
-
+//Function to check if a char array or pointer is a number.
 int isNumeric (const char * s)
 {
     if (s == NULL || *s == '\0' || isspace(*s))
@@ -111,6 +111,12 @@ void* serverStart(void* vargs)
                     //Set flag to look for item name next.
                     bidName = 1;
                 }
+                //Seller function, to request the removal of an item, we will need a function to process this.
+                if(strcmp(buffer, "remove") == 0)
+                {
+                    //Need method that will process the input, will need to implement another flag to get the input as well probably.
+                }
+
                 //When server receives buyer, we can mark the client down as a buyer, able to be changed.
                 if(strcmp(buffer, "buyer") == 0)
                 {
