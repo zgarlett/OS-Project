@@ -33,7 +33,7 @@ int main(){
         exit(1);
     }
     printf("Connected to server successfully, please input whether this client is a buyer or seller.\n");
-    printf("You may type 'exit' to end the connection at any time.");
+    printf("You may type 'exit' to end the connection at any time.\n");
 
     //Send and receive loop
     while(1){
@@ -47,7 +47,6 @@ int main(){
             printf("Disconnected from server.\n");
             exit(1);
         }
-
         if(recv(clientSocket, buffer, 1024, 0) < 0){
             printf("Error in receiving data.\n");
         }
