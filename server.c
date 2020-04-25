@@ -3,24 +3,42 @@
 //3/30
 	
 #include "server.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <stdbool.h>
+#include <sys/ipc.h> 	// Used by IPC maechanisms: messages, shared memory and semaphores
+#include <sys/msg.h>	// for message queue structures
+#include <string.h>		// for string operation: strlen
+#include <sys/wait.h>	// for wait
+#include <fcntl.h>		// for file control options
+#include <errno.h>		// for system error numbers
+#include <mqueue.h>
+
+#define QUEUE_SERVER1   "/server1"
+#define QUEUE_SERVER2   "/server2"
+#define QUEUE_SERVER3   "/server3"
+#define QUEUE_SERVER4   "/server4"
+#define PERMISSIONS 0660
+#define MAX_MESSAGES 10
+#define MAX_MSG_SIZE 256
+#define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
+#define MAX 9000
 
 	
 	
 void* serverStart(void *vargs)
 {
-    int serverSocket;
-
+    	int serverSocket;
+	int port = *(int *) vargs;
 	struct sockaddr_in serverAddr, cli_addr;
-    socklen_t sin_size;
+    	socklen_t sin_size;
 
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(8080);
+	serverAddr.sin_port = htons(port);
 	serverAddr.sin_addr.s_addr = htons(INADDR_ANY);
 
     if((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0 ){
