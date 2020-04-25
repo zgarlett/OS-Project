@@ -17,6 +17,7 @@
 #include <fcntl.h>		// for file control options
 #include <errno.h>		// for system error numbers
 #include <mqueue.h>
+#include <ctype.h>
 
 #define QUEUE_SERVER1   "/server1"
 #define QUEUE_SERVER2   "/server2"
@@ -28,15 +29,23 @@
 #define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
 #define MAX 9000
 
-	
+//Function to check if a char array or pointer is a number.
+int isNumeric (const char * s)
+{
+    if (s == NULL || *s == '\0' || isspace(*s))
+        return 0;
+    char * p;
+    strtod (s, &p);
+    return *p == '\0';
+}
 	
 void* serverStart(void *vargs)
 {
-    	int serverSocket;
+    int serverSocket, newSocket;
 	int port = *(int *) vargs;
 	struct sockaddr_in serverAddr, cli_addr;
-    	socklen_t sin_size;
-
+    socklen_t sin_size;
+	memset(&serverAddr, '\0', sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(port);
 	serverAddr.sin_addr.s_addr = htons(INADDR_ANY);
@@ -63,15 +72,102 @@ void* serverStart(void *vargs)
     }
 
     //Infinitely accept connections while running.
-    while (1)
-    {
-        //Socket for client
-        int clientfd;
-        struct sockaddr_in client_addr;
-        int addrlen=sizeof(client_addr);
+    //MAIN SERVER LOOP
+	while(1){
+        newSocket = accept(serverSocket, (struct sockaddr*)&cli_addr, &addr_size);
+        if(newSocket < 0){
+            exit(1);
+        }
+        printf("Connection accepted from new client!\n");
 
-        //Accept incoming client connections.
-        clientfd = accept(serverSocket, (struct sockaddr*)&client_addr,(socklen_t *) &addrlen);
+        if((childpid = fork()) == 0){
+            close(serverSocket);
+
+            //Flags used for accepting client input properly, below is set when preparing to read a numeric input (bid amount) from the client
+            int bidFlag = 0;
+            //This flag is used when preparing to accept the item name to bid on.
+            int bidName = 0;
+
+            //Temporary storage variables
+            char itemName[16];
+            float bidAmount;
+            while(1){
+
+                //Receive clients input here
+                recv(newSocket, buffer, 1024, 0);
+                //Then compare the input and perform the correct result
+                //Disconnect from client when "exit" is received.
+                if(strcmp(buffer, "exit") == 0){
+                    printf("Disconnected from a client\n");
+                    break;
+                }
+                //When bid flag is enabled, next input will be registered as bid amount
+                if(isNumeric(buffer) && bidFlag == 1)
+                {
+                    bidAmount = (float)atof(buffer);
+                    printf("Bid accepted, item name was: %s, bid amount is %f\n", itemName, bidAmount);
+                    bidFlag = 0;
+
+                    //Then we would want to pass off the data to a bidding function that will check for closing time, and register the bid.
+                }
+
+                //When bid name flag has been set, server will attempt to read in the item name, and save it temporarily.
+                if(bidName == 1)
+                {
+                    //Now we would need to check if item name exists here, for now we will simply accept the input
+                    strcpy(itemName, buffer);
+                    //Then unset the flag, and set the bidFlag to check for next argument (amount)
+                    bidName = 0;
+                    bidFlag = 1;
+
+                    printf("Item name accepted, checking for next argument (amount) \n");
+                }
+
+                if(strcmp(buffer, "bid") == 0)
+                {
+                    //Server has picked up the bid argument, it will expect some more arguments (the item ID) to arrive as well, it will see if it picks up, and if not
+                    //alert the user that they did not enter their item id
+                    printf("Received bid, checking for next argument (name)\n.");
+
+                    //Set flag to look for item name next.
+                    bidName = 1;
+                }
+                //Seller function, to request the removal of an item, we will need a function to process this.
+                if(strcmp(buffer, "remove") == 0)
+                {
+                    //Need method that will process the input, will need to implement another flag to get the input as well probably.
+                }
+
+                //When server receives buyer, we can mark the client down as a buyer, able to be changed.
+                if(strcmp(buffer, "buyer") == 0)
+                {
+                    strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a buyer, please type 'seller' if you would like to change type");
+                    send(newSocket, buffer, strlen(buffer), 0);
+                    //Clean out buffer
+                    bzero(buffer, sizeof(buffer));
+
+                    //Then we can go ahead and see what the buyer wants
+                }
+                //When server receives seller, we can mark the client down as a seller, able to be changed.
+                if(strcmp(buffer, "seller") == 0)
+                {
+                    strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a seller, please type 'buyer' if you would like to change type");
+                    send(newSocket, buffer, strlen(buffer), 0);
+                    bzero(buffer, sizeof(buffer));
+                }
+
+                else
+                {
+                    printf("Client: %s\n", buffer);
+                    send(newSocket, buffer, strlen(buffer), 0);
+                    bzero(buffer, sizeof(buffer));
+                }
+            }
+        }
+
+    }
+
+    close(newSocket);
 
 	/*~~~~things to do/note here~~~~
 	* We cant do this iteratively for every client we will need to probably fork here for each client. Forking doesn't work well on my vm will ask others
