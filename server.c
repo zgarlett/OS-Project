@@ -42,8 +42,10 @@ int isNumeric (const char * s)
 void* serverStart(void *vargs)
 {
     int serverSocket, newSocket;
+    char buffer[1024];
 	int port = *(int *) vargs;
 	struct sockaddr_in serverAddr, cli_addr;
+	pid_t childpid;
     socklen_t sin_size;
 	memset(&serverAddr, '\0', sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
@@ -74,7 +76,7 @@ void* serverStart(void *vargs)
     //Infinitely accept connections while running.
     //MAIN SERVER LOOP
 	while(1){
-        newSocket = accept(serverSocket, (struct sockaddr*)&cli_addr, &addr_size);
+        newSocket = accept(serverSocket, (struct sockaddr*)&cli_addr, &sin_size);
         if(newSocket < 0){
             exit(1);
         }
@@ -231,11 +233,8 @@ void* serverStart(void *vargs)
 	}
 	
         //Close connection with client.
-        close(clientfd);
+        close(newSocket);
     }
-    close(serverSocket);
-    return NULL;
-}
 //find item by userID
 void find_item_by_userID(Client user){
 	//TODO look below at file name
