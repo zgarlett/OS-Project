@@ -358,18 +358,18 @@ int check_add_or_remove(){
 
 void * acceptConnections(void * vargs){
 
-  char * ask = "Input Test: ";
+	char * ask = "Input Test: ";
   char buffer[1024];
   int servSock = *(int*) vargs;
 
-  printf("Waiting for connections on Server %d...\n", serverNumber);
+  printf("Waiting for connections on Server ...\n");
 
   int clientfd,val;
   while (clientfd = accept(servSock,NULL,NULL)){
 
 
       //Accept incoming client connections.
-      printf("Connected to Server %d!\n",serverNumber);
+      printf("Connected to Server!\n");
 
 
       send(clientfd, ask , strlen(ask), 0);
