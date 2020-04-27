@@ -14,18 +14,15 @@ int ports[4] = {8181,8182,8183,8184};
 int main(int argc, char const *argv[]){
 
 
-    //Creating thread for server
-    pthread_t thread[4];
-
-
-    for(int i = 0; i < 4; i++){
-      pthread_create (&thread[i], NULL, serverStart, (void * ) &ports[i]);
-      printf("Port Number %d\n", ports[i]);
-
-    }
-
-    for(int i = 0; i < 4; i++){
-      pthread_join(thread[i], NULL);
+    if(fork() > 0){
+        serverStart((void *) ports[0]);
+        if(fork() > 0){
+            serverStart((void *) ports[1]);
+        } else {
+            serverStart((void *) ports[2]);
+        }
+    } else {
+        serverStart((void *) ports[3]);
     }
 
     return 0;
