@@ -443,3 +443,17 @@ void sendMessageToServers(char * message){
   mq_send (server4, message, strlen (message) + 1, 0);
 
 }
+
+void checkRecievedMessage(char * message){
+	
+	//if the file has changed
+	if(strcmp(message,FILE_WRITTEN) == 0){
+		//read file again method
+		//print to clients method
+
+		//if auction has finished
+	} else if(strcmp(message,AUCTION_END) == 0){
+		//tell all clients method
+
+	} 
+}
