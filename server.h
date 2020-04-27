@@ -42,6 +42,7 @@ void * serverStart(void *vargs);
 void * listenMessageServer(void *vargs);
 void * acceptConnections(void *vargs);
 void sendMessageToServers(char * message);
+void checkRecievedMessage(char * message);
 
 //checks for ID 
 int checkID(int buyer_or_seller);
