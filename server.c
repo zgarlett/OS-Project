@@ -1,7 +1,7 @@
 //Operating Systems
 //Group K
 //3/30
-	
+
 #include "server.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,7 +38,7 @@ int isNumeric (const char * s)
     strtod (s, &p);
     return *p == '\0';
 }
-	
+
 void* serverStart(void *vargs)
 {
     int serverSocket, newSocket;
@@ -166,8 +166,8 @@ void* serverStart(void *vargs)
 
                 }
                 */
-                
-                
+
+
 
                 //When server receives buyer, we can mark the client down as a buyer, able to be changed.
                 if(strcmp(buffer, "buyer") == 0)
@@ -194,7 +194,13 @@ void* serverStart(void *vargs)
                     bzero(buffer, sizeof(buffer));
                 }
             }
-        }
+        } else if (childpid > 0){
+			//Listen for IPC based on port passed in methdod serverStart(void * port)
+			//To send a message to each server use the method sendMessageToServers(char * message)
+			//Depending on the message the server will read FILE_A and FILE_B again, or send messages to all clients
+			//How are we going to keep track of all the clients???
+			listenMessageServer((void *) port);
+		}
 
     }
 
@@ -202,39 +208,39 @@ void* serverStart(void *vargs)
 
 	/*~~~~things to do/note here~~~~
 	* We cant do this iteratively for every client we will need to probably fork here for each client. Forking doesn't work well on my vm will ask others
-	* Might need to restructure for forkage. 
+	* Might need to restructure for forkage.
 	* I'll write out here the code each client will use but forking will need to be discussed between us
 	*/
 
 //gets whether he a buyer or seller (could make this a method)
-//buyer = 0 | seller = 1 
+//buyer = 0 | seller = 1
 	int buyer_or_seller = 0;
 	int bORs_test = 0;
 	while(bORs_test == 0){
-		
+
 		printf("Are you a buyer or seller? (type 0 for buyer, 1 for seller)\n");
 		scanf("%d",&buyer_or_seller);
 		if(buyer_or_seller == 0	|| buyer_or_seller == 1){
-			bORs_test = 1;			
+			bORs_test = 1;
 		}else{
 		printf("I know reading is hard but I know children under 5 who listen better than you\n");
 		printf("please try again...\n");
 		}
 	}
-//going to make most stuff a method from here on. Threading could give incorrect results though need to be careful here. 
+//going to make most stuff a method from here on. Threading could give incorrect results though need to be careful here.
 	//gets id and checks if it exists returns only if ID fount atm
 	int userID = checkID(buyer_or_seller);
 	//gets the client associated with the ID
 	Client client = findID(userID);
 	//if buyer
 	if(buyer_or_seller == 0){
-		//checks if buying or bidding: 0 = buy | 1 = bid 
+		//checks if buying or bidding: 0 = buy | 1 = bid
 		int buy_or_bid = check_buy_or_bid();
 		//if buy
 		if(buy_or_bid == 0){
 			printf("retrieving list of items you have won the bid for\n");
 			//TODO write code for this. (need other parts done for this)
-			//cant method this out since we could be returning an array	
+			//cant method this out since we could be returning an array
 		}
 		//if bid
 		if(buy_or_bid == 1){
@@ -249,9 +255,9 @@ void* serverStart(void *vargs)
 		//if add
 		if(add_or_remove == 0){
 			Item item = create_item(userID);
-			//TODO add to file. (need other parts done for this)	
+			//TODO add to file. (need other parts done for this)
 			//make a method for this
-			//make sure to increase num_items_selling		
+			//make sure to increase num_items_selling
 		}
 		//if remove
 		if(add_or_remove == 1){
@@ -260,7 +266,7 @@ void* serverStart(void *vargs)
 			//make sure to decrease num_items_selling
 		}
 	}
-	
+
         //Close connection with client.
         close(newSocket);
     }
@@ -272,15 +278,15 @@ void find_item_by_userID(Client user){
 	if(infile == NULL){ printf("file wasn't loaded\n");}
 	Item item;
 	while(item.itemID != NULL){
-		fread(&item, sizeof(item),1,infile);	
+		fread(&item, sizeof(item),1,infile);
 		if(item.sellerID == user.clientID){
 			printf("itemID:%d, itemName:%s, item StartPrice:%f\n",item.itemID,item.name,item.startprice);
 		//TODO alot more needed here but I'm done for today
 			printf("is this your item?\n");
 		}
 	}
-	
-	
+
+
 }
 //find item by ID
 Item find_item_by_itemID(int itemID){
@@ -309,10 +315,10 @@ Item create_item(int userID){
 	return item;
 }
 //method for checking ID
-//doesn't use the buyer_or_seller method but I included because it might be useful depending on how we save clients. 
+//doesn't use the buyer_or_seller method but I included because it might be useful depending on how we save clients.
 int checkID(int buyer_or_seller){
 //this method assumes the user has an ID there is no exit without one
-//TODO ~~~need to make exit without id~~~	
+//TODO ~~~need to make exit without id~~~
 	int userID = 0;
 	int test = 0;
 	//gets user id tests if its valid etc
@@ -337,17 +343,17 @@ Client findID(int userID){
 	/*gets file of users fix the below line when we know name*/
 	FILE *infile = fopen("SOMETHINGHERE.TEXT","r");
 	if(infile == NULL){ printf("file wasn't loaded\n");}
-	
+
 	//Client used for iterating
 	Client client;
 	//read each struct in from file and tests them against ID.
-	int counter = 0; 
+	int counter = 0;
 
 	//~~~~~~~~~This test case will need to be changed this will cause segfault we just need to figure out how we will determine total amount of users~~~~~~~~~~~~~~!
 
 	while(client.clientID != NULL){
 		fread(&client, sizeof(Client),1,infile);
-		counter++;	
+		counter++;
 		if(client.clientID == userID){return client;}
 	}
 	//if clientID == 0 then wasn't found
@@ -363,7 +369,7 @@ int check_buy_or_bid(){
 		printf("Do you want to buy or bid?(0 for buy, 1 for bid)\n");
 		scanf("%d", &buy_or_bid);
 		if(buy_or_bid == 1 || buy_or_bid == 0){
-			return buy_or_bid;		
+			return buy_or_bid;
 		}else{
 			printf("Stop trying to break me please I'm fragile\n");
 		}
@@ -384,6 +390,7 @@ int check_add_or_remove(){
 		}
 }
 
+//Needed only if we are going to use threads
 void * acceptConnections(void * vargs){
 
 	char * ask = "Input Test: ";
@@ -411,6 +418,7 @@ void * acceptConnections(void * vargs){
   close(servSock);
 }
 
+//Listen for messages on infinite loop
 void * listenMessageServer(void * vargs){
 
     mqd_t server1,server2,server3,server4;
@@ -451,6 +459,8 @@ void * listenMessageServer(void * vargs){
     }
 }
 
+
+//Send message to all service centers, including self
 void sendMessageToServers(char * message){
 
   mqd_t server1,server2, server3,server4;
@@ -473,8 +483,10 @@ void sendMessageToServers(char * message){
 
 }
 
+//Use this message after writing to file, or other major processes that others
+//service centers need to know about. Please use the constants at the top of the file
 void checkRecievedMessage(char * message){
-	
+
 	//if the file has changed
 	if(strcmp(message,FILE_WRITTEN) == 0){
 		//read file again method
@@ -484,5 +496,5 @@ void checkRecievedMessage(char * message){
 	} else if(strcmp(message,AUCTION_END) == 0){
 		//tell all clients method
 
-	} 
+	}
 }
