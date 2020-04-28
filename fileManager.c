@@ -34,12 +34,10 @@ typedef struct soldItem
 
 
 int IDcheck;
-    struct bidItem item[25];
-
 //----------------
 
 //Method Declarations
-struct bidItem readf(int ID);
+struct bidItem readfa(int ID);
 void writefa(struct bidItem);
 void testCreate();
 //-------------------
@@ -49,9 +47,10 @@ void testCreate();
 //Given an ID, this method will return a struct of all info related to item
 struct bidItem readfa(int ID)
 {
+    struct bidItem item[100];
 
     FILE *fp;
-    fp = fopen("FILE_A.txt", "r");
+    fp = fopen("FILE_A.bin", "rb");
     if (fp == NULL)
     {
         printf("Error opening file from read()\n");
@@ -60,13 +59,13 @@ struct bidItem readfa(int ID)
 
     int i = 0;
 
-    while((fscanf(fp, "%d\t%s\t%d\t%f\t%s\t%s\n", &item[i].bidID, &item[i].itemName, &item[i].itemQuantity, &item[i].startingBid, &item[i].bidEndDate, &item[i].merchantInformation) != EOF) && (i < 25))
+    while (!feof(fp))
     {
-        //Below line is just to test if it can read anything from the file
-        //It's been printing a bunch of nonsense, i assume its memory errors
-        printf("Test read: %d\t%s\t%d\t%f\t%s\t%s\n", item[i].bidID, item[i].itemName, item[i].itemQuantity, item[i].startingBid, item[i].bidEndDate, item[i].merchantInformation);
+        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
         i++;
     }
+
+
     fclose(fp);
 
     return item[ID];
@@ -77,8 +76,10 @@ struct bidItem readfa(int ID)
 struct soldItem readfb(int ID)
 {
 
+    struct soldItem item[100];
+
     FILE *fp;
-    fp = fopen("FILE_B.txt", "r");
+    fp = fopen("FILE_B.bin", "rb");
     if (fp == NULL)
     {
         printf("Error opening file from read()\n");
@@ -87,13 +88,13 @@ struct soldItem readfb(int ID)
 
     int i = 0;
 
-    while((fscanf(fp, "%d\t%s\t%f\t%d\t%s\n",  item.soldID, item.buyInformation, item.buyingPrice, item.center, item.purchaseDate);
+    while (!feof(fp))
     {
-        //Below line is just to test if it can read anything from the file
-        //It's been printing a bunch of nonsense, i assume its memory errors
-        printf("Test read: %d\t%s\t%d\t%f\t%s\t%s\n", item[i].bidID, item[i].itemName, item[i].itemQuantity, item[i].startingBid, item[i].bidEndDate, item[i].merchantInformation);
+        fread(&item[i], sizeof(item) +1, 1, fp);
         i++;
     }
+
+
     fclose(fp);
 
     return item[ID];
@@ -103,25 +104,32 @@ struct soldItem readfb(int ID)
 //Takes in, and prints a bidItem to FILE A
 void writefa(struct bidItem item)
 {
+    struct bidItem temp = item;
     FILE *fp;
-    fp = fopen("FILE_A.txt", "a+");
+    fp = fopen("FILE_A.bin", "a+");
     if (fp == NULL)
     {
         printf("Error opening file from writefa()");
     }
 
-    fprintf(fp, "%d\t%s\t%d\t%f\t%s\t%s\n", item.bidID, item.itemName, item.itemQuantity, item.startingBid, item.bidEndDate, item.merchantInformation);
+    fwrite(&item, sizeof(temp) + 1, 1, fp);
+
+
+    //fprintf(fp, "%d\t%s\t%d\t%f\t%s\t%s\n", item.bidID, item.itemName, item.itemQuantity, item.startingBid, item.bidEndDate, item.merchantInformation);
     fclose(fp);
 }
 //Takes a soldItem as a parameter and prints it to File B
 void writefb(struct soldItem item)
 {
     FILE *fp;
-    fp = fopen("FILE_B.txt", "a+");
+    fp = fopen("FILE_B.bin", "a+");
     if (fp == NULL)
     {
         printf("Error opening file from writefb()");
     }
+
+    fwrite(&item, sizeof(item) + 1, 1, fp);
+
 
     fprintf(fp, "%d\t%s\t%f\t%d\t%s\n",  item.soldID, item.buyInformation, item.buyingPrice, item.center, item.purchaseDate);
     fclose(fp);
@@ -130,37 +138,34 @@ void testCreate()
 {
 
     //Creates, writes, then reads back a test bidItem
-    struct bidItem test = { IDcheck, "TestName", 1, 1, "MM/DD/YYYY", "Merchant Information"};
+    struct bidItem test = {IDcheck, "TestName", 1, 1, "MM/DD/YYYY", "Merchant Information"};
     IDcheck++;
-
-
-
-
-
 
     writefa(test);
     //struct bidItem temp = read(IDcheck-1);
     //printf("Test: %d\t%s\t%d\t%f\t%s\t%s\n", temp.bidID, temp.itemName, temp.itemQuantity, temp.startingBid, temp.bidEndDate, temp.merchantInformation);
 
 }
+
 int main()
 {
     //This opens and closes file to ensure westart with a blank file everytime
     FILE *fp;
-    fp = fopen("FILE_A.txt", "w");
+    fp = fopen("FILE_A.bin", "w");
     fclose(fp);
+
+
 
     //ID check generates sequential ID's for items made in testCreate
     IDcheck = 1;
-    for (int i = 0; i < 25; i++)
+    for (int i = 0; i < 30; i++)
     {
         testCreate();
     }
 
-
     //More testing to try and read something from file
     struct bidItem temp;
-    temp = readf(5);
-    printf("%d, %d", temp.bidID, temp.itemQuantity);
+    temp = readfa(20);
+    printf("Test: %d\t%s\t%d\t%f\t%s\t%s\n", temp.bidID, temp.itemName, temp.itemQuantity, temp.startingBid, temp.bidEndDate, temp.merchantInformation);
 
 }
