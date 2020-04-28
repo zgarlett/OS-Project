@@ -139,6 +139,35 @@ void* serverStart(void *vargs)
                 {
                     //Need method that will process the input, will need to implement another flag to get the input as well probably.
                 }
+                //Opens up the options to add a 'bidItem' to File A
+                /* Breaks client/server communication, commenting out
+                if(strcmp(buffer, "list") == 0)
+                {
+                    strcpy(buffer, "list");
+                    send(newSocket, buffer, strlen(buffer), 0);
+
+                    struct bidItem temp;
+                    recv(newSocket, buffer, 1024, 0);
+                    temp.bidID = atoi(buffer);
+                    recv(newSocket, buffer, 1024, 0);
+                    strcpy(temp.itemName, buffer);
+                    recv(newSocket, buffer, 1024, 0);
+                    temp.itemQuantity = atoi(buffer);
+                    recv(newSocket, buffer, 1024, 0);
+                    temp.startingBid = strtof(buffer, NULL);
+                    recv(newSocket, buffer, 1024, 0);
+                    strcpy(temp.bidEndDate, buffer);
+                    recv(newSocket, buffer, 1024, 0);
+                    strcpy(temp.merchantInformation, buffer);
+
+                    //writes file into file A through fileManager
+                    writef(temp);
+
+
+                }
+                */
+                
+                
 
                 //When server receives buyer, we can mark the client down as a buyer, able to be changed.
                 if(strcmp(buffer, "buyer") == 0)

@@ -44,7 +44,7 @@ void connectToServer(){
 		printf("Trying next service center\n");
 		if(portPosition > 3)
 		{
-			printf("Failed to find service center to connect to.");
+			printf("Failed to find service center to connect to.\n");
 			exit(1);
 		}
 	}
@@ -69,6 +69,8 @@ void connectToServer(){
 	
 	    //Take in Item info and List
 	    //Will send Item struct to be written to file
+	    //Currently breaks client/server communication, commenting out
+	    /*
         if(strcmp((recv(clientSocket, buffer, 1024, 0)), "list") == 0){
 
             char tempchar[50];
@@ -97,7 +99,7 @@ void connectToServer(){
             scanf("%s", tempchar);
             send(clientSocket, tempchar, strlen(tempchar), 0);
         }
-	    
+	    */
         else
             {
             printf("Server: \t%s\n", buffer);
