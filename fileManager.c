@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "fileManager.h"
 
 //Tyler Porter
 //Project
@@ -10,44 +11,25 @@
 //make a create() function to take input from user and write an item to file A
 //make methods that control data movement from file A to file B once an item has been sold
 
-//??Make a method to populate an array of bidItem structs for easier file management
+//??Make a method to populate an array of BidItem structs for easier file management
 
-//Global Variables
-typedef struct bidItem
-{
-    int bidID;
-    char itemName[50];
-    int itemQuantity;
-    float startingBid;
-    char bidEndDate[50];
-    char merchantInformation[50];
-};
-
-typedef struct soldItem
-{
-    int soldID;
-    char buyInformation[50];
-    float buyingPrice;
-    int center;
-    char purchaseDate[50];
-};
-
-
-int IDcheck;
+//~~~wut is dis?
+//int IDcheck;
 //----------------
+/*Starkey's change list
+* Moved everything that needed to be in the .h file to that
+* Created new method: basically same as readfa but takes item ID and returns the match
+* Created new method: Also same as above but for readfb/sold items (uses soldID) 
+* Created new method: gets soldItems by buyerID
+* Created new method: Gets total number of items in file A
+*/
 
-//Method Declarations
-struct bidItem readfa(int ID);
-void writefa(struct bidItem);
-void testCreate();
-//-------------------
-
-//File A will be tab delimited with info as such by line
 //Item ID - Item Name - Item quantity - starting bid - bid end date - merchant info \n
 //Given an ID, this method will return a struct of all info related to item
-struct bidItem readfa(int ID)
+//TODO this might need to take in socket info so that the bid info can be sent to the user?????
+BidItem readfa(int ID)
 {
-    struct bidItem item[100];
+    BidItem item[100];
 
     FILE *fp;
     fp = fopen("FILE_A.bin", "rb");
@@ -69,14 +51,71 @@ struct bidItem readfa(int ID)
     fclose(fp);
 
     return item[ID];
+}
+
+int get_bid_item_num()
+{
+    BidItem item[100];
+
+    FILE *fp;
+    fp = fopen("FILE_A.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+
+
+    int i = 0;
+
+    while (!feof(fp))
+    {
+        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
+        i++;
+    }
+
+
+    fclose(fp);
+
+    return i;
 
 
 }
+//find by itemID bid
+BidItem bget_item_by_id(int itemID)
+{
+	BidItem item;
 
-struct soldItem readfb(int ID)
+    FILE *fp;
+    fp = fopen("FILE_A.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+
+
+    int i = 0;
+
+    while (!feof(fp))
+    {
+		
+        fread(&item, sizeof(item) + 1, 1, fp);
+		if(item.itemID == itemID){
+			fclose(fp);
+			return item;
+		}
+        i++;
+    }
+
+//really bad if it gets here will most likely give random answers ~~~~ 
+    fclose(fp);
+
+    return item[ID];
+}
+
+SoldItem readfb(int ID)
 {
 
-    struct soldItem item[100];
+    SoldItem item[100];
 
     FILE *fp;
     fp = fopen("FILE_B.bin", "rb");
@@ -101,10 +140,70 @@ struct soldItem readfb(int ID)
 
 
 }
-//Takes in, and prints a bidItem to FILE A
-void writefa(struct bidItem item)
+//gets sold items by their item ID
+SoldItem Sget_item_by_id(int itemID){
+
+    SoldItem item;
+
+    FILE *fp;
+    fp = fopen("FILE_B.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+
+
+    int i = 0;
+
+    while (!feof(fp))
+    {
+        fread(&item, sizeof(item) +1, 1, fp);
+		if(item.soldID == itemID){
+			fclose(fp);
+			return item;
+		}
+        i++;
+    }
+
+//just like above really bad if it hits this since there are no catches. 
+    fclose(fp);
+
+    return item[ID];
+}
+//can only get one item at a time. DONT GIVE USER OPTION TO BUY ANYTHING BUT THE FIRST ITEM THAT COMES UP
+SoldItem Sget_item_by_buyerID(int buyerID){
+
+    SoldItem item;
+
+    FILE *fp;
+    fp = fopen("FILE_B.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+
+
+    int i = 0;
+
+    while (!feof(fp))
+    {
+        fread(&item, sizeof(item) +1, 1, fp);
+		if(item.buyerID == buyerID){
+			fclose(fp);
+			return item;
+		}
+        i++;
+    }
+
+//just like above really bad if it hits this since there are no catches. 
+    fclose(fp);
+
+    return item[ID];
+}
+//Takes in, and prints a BidItem to FILE A
+void writefa(BidItem item)
 {
-    struct bidItem temp = item;
+    BidItem temp = item;
     FILE *fp;
     fp = fopen("FILE_A.bin", "a+");
     if (fp == NULL)
@@ -118,8 +217,8 @@ void writefa(struct bidItem item)
     //fprintf(fp, "%d\t%s\t%d\t%f\t%s\t%s\n", item.bidID, item.itemName, item.itemQuantity, item.startingBid, item.bidEndDate, item.merchantInformation);
     fclose(fp);
 }
-//Takes a soldItem as a parameter and prints it to File B
-void writefb(struct soldItem item)
+//Takes a SoldItem as a parameter and prints it to File B
+void writefb(SoldItem item)
 {
     FILE *fp;
     fp = fopen("FILE_B.bin", "a+");
@@ -137,16 +236,16 @@ void writefb(struct soldItem item)
 void testCreate()
 {
 
-    //Creates, writes, then reads back a test bidItem
-    struct bidItem test = {IDcheck, "TestName", 1, 1, "MM/DD/YYYY", "Merchant Information"};
+    //Creates, writes, then reads back a test BidItem
+    BidItem test = {IDcheck, "TestName", 1, 1, "MM/DD/YYYY", "Merchant Information"};
     IDcheck++;
 
     writefa(test);
-    //struct bidItem temp = read(IDcheck-1);
+    //struct BidItem temp = read(IDcheck-1);
     //printf("Test: %d\t%s\t%d\t%f\t%s\t%s\n", temp.bidID, temp.itemName, temp.itemQuantity, temp.startingBid, temp.bidEndDate, temp.merchantInformation);
 
 }
-
+/*
 int main()
 {
     //This opens and closes file to ensure westart with a blank file everytime
@@ -164,8 +263,8 @@ int main()
     }
 
     //More testing to try and read something from file
-    struct bidItem temp;
+    struct BidItem temp;
     temp = readfa(20);
     printf("Test: %d\t%s\t%d\t%f\t%s\t%s\n", temp.bidID, temp.itemName, temp.itemQuantity, temp.startingBid, temp.bidEndDate, temp.merchantInformation);
 
-}
+}*/
