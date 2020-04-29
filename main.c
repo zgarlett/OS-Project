@@ -15,14 +15,14 @@ int main(int argc, char const *argv[]){
 
 
     if(fork() > 0){
-        serverStart((void *) ports[0]);
+        serverStart((void *) &ports[0]);
         if(fork() > 0){
-            serverStart((void *) ports[1]);
+            serverStart((void *) &ports[1]);
         } else {
-            serverStart((void *) ports[2]);
+            serverStart((void *) &ports[2]);
         }
     } else {
-        serverStart((void *) ports[3]);
+        serverStart((void *) &ports[3]);
     }
 
     return 0;

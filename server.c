@@ -18,7 +18,6 @@
 #include <errno.h>		// for system error numbers
 #include <mqueue.h>
 #include <ctype.h>
-#include "fileManager.h"
 
 #define QUEUE_SERVER1   "/server1"
 #define QUEUE_SERVER2   "/server2"
@@ -29,6 +28,9 @@
 #define MAX_MSG_SIZE 256
 #define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
 #define MAX 9000
+//Not sure what these are for at the moment, these I had to add to fix compiler errors.
+#define FILE_WRITTEN 1
+#define AUCTION_END 1
 
 //Function to check if a char array or pointer is a number.
 int isNumeric (const char * s)
@@ -86,7 +88,7 @@ void* serverStart(void *vargs)
         if((childpid = fork()) == 0){
             close(serverSocket);
 			//buyer or seller flag: buyer = 0 | seller = 1 | 2 if not set
-			int buyer_or_seller == 2;
+			int buyer_or_seller = 2;
 			
 			//gets id and checks if it exists returns only if ID found atm
 			int userID = checkID(buyer_or_seller);
@@ -145,10 +147,12 @@ void* serverStart(void *vargs)
 				if(buyer_or_seller == 0){
 					if(isNumeric(buffer) && bidFlag == 1)
 					{
+						char tempString[180];
 						bidAmount = (float)atof(buffer);
 						printf("Bid accepted, item name was: %s, bid amount is %f\n", itemName, bidAmount);
 						//TODO does this work? do we need \n?
-						strcpy(buffer,"Bid accepted, item name was: %s, bid amount is %f\n", itemName, bidAmount);
+						sprintf(tempString, "Bid accepted, item name was: %s, bid amount is %f\n", itemName, bidAmount);
+						strcpy(buffer, tempString);
 						send(newSocket, buffer,strlen(buffer), 0);
 						bzero(buffer, sizeof(buffer));
 						//TODO send above to user as well
@@ -159,7 +163,7 @@ void* serverStart(void *vargs)
 					if(strcmp(buffer, "buy") == 0)
 					{
 						//TODO this wont work fix this 
-						find_item_by_userID(userID);
+						//find_item_by_userID(userID);
 					}
 
 					//When bid name flag has been set, server will attempt to read in the item name, and save it temporarily.
@@ -185,24 +189,28 @@ void* serverStart(void *vargs)
 						bzero(buffer, sizeof(buffer));
 						//"%d\t%s\t%d\t%f\t%s\t%s\n", item.bidID, item.itemName, item.itemQuantity, item.startingBid, item.bidEndDate, item.merchantInformation)
 						//creating for loop to send out items.
-						BidItem = item;
+						BidItem item;
 						int num = get_bid_item_num();
 						for(int i = 0;i < num; i++){
 							item = readfa(i);
-							
-							strcpy(buffer, "Item ID: %d",item.itemID);
+							char tempString[128];
+							sprintf(tempString, "Item ID: %d", item.itemID);
+							strcpy(buffer, tempString);
 							send(newSocket,buffer,strlen(buffer),0);
 							bzero(buffer, sizeof(buffer));
 							
-							strcpy(buffer, "Item Name: %s",item.itemName);
+							sprintf(tempString, "Item Name: %s", item.itemName);
+							strcpy(buffer, tempString);
+							send(newSocket,buffer,strlen(buffer),0);
+							bzero(buffer, sizeof(buffer));
+
+							sprintf(tempString, "Starting Bid: %f", item.startingBid);
+							strcpy(buffer, tempString);
 							send(newSocket,buffer,strlen(buffer),0);
 							bzero(buffer, sizeof(buffer));
 							
-							strcpy(buffer, "Starting Bid: %f",item.startingBid);
-							send(newSocket,buffer,strlen(buffer),0);
-							bzero(buffer, sizeof(buffer));
-							
-							strcpy(buffer, "Bid End Date: %s", item.bidEndDate);
+							sprintf(tempString, "Bid End Date: %s", item.bidEndDate);
+							strcpy(buffer, tempString);
 							send(newSocket,buffer,strlen(buffer),0);
 							bzero(buffer, sizeof(buffer));
 						}
@@ -255,44 +263,14 @@ void* serverStart(void *vargs)
 				}
 			}
 		}
-	}
-                //Opens up the options to add a 'bidItem' to File A
-                /* Breaks client/server communication, commenting out
-                if(strcmp(buffer, "list") == 0)
-                {
-                    strcpy(buffer, "list");
-                    send(newSocket, buffer, strlen(buffer), 0);
-
-                    struct bidItem temp;
-                    recv(newSocket, buffer, 1024, 0);
-                    temp.bidID = atoi(buffer);
-                    recv(newSocket, buffer, 1024, 0);
-                    strcpy(temp.itemName, buffer);
-                    recv(newSocket, buffer, 1024, 0);
-                    temp.itemQuantity = atoi(buffer);
-                    recv(newSocket, buffer, 1024, 0);
-                    temp.startingBid = strtof(buffer, NULL);
-                    recv(newSocket, buffer, 1024, 0);
-                    strcpy(temp.bidEndDate, buffer);
-                    recv(newSocket, buffer, 1024, 0);
-                    strcpy(temp.merchantInformation, buffer);
-
-                    //writes file into file A through fileManager
-                    writef(temp);
-
-
-                }
-                */
-            }
-        } else if (childpid > 0){
+		else if (childpid > 0){
 			//Listen for IPC based on port passed in methdod serverStart(void * port)
 			//To send a message to each server use the method sendMessageToServers(char * message)
 			//Depending on the message the server will read FILE_A and FILE_B again, or send messages to all clients
 			//How are we going to keep track of all the clients???
 			listenMessageServer((void *) port);
 		}
-    }
-	//Close connection with client.
+	}
 	close(newSocket);
 }
 //this should be unused 
@@ -530,7 +508,6 @@ void sendMessageToServers(char * message){
 //Use this message after writing to file, or other major processes that others
 //service centers need to know about. Please use the constants at the top of the file
 void checkRecievedMessage(char * message){
-
 	//if the file has changed
 	if(strcmp(message,FILE_WRITTEN) == 0){
 		//read file again method

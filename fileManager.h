@@ -58,7 +58,7 @@ void testCreate();
 BidItem bget_item_by_id(int itemID);
 SoldItem Sget_item_by_id(int itemID);
 //gets items by buyer ID;
-SoldItem Sget_item_by_buyerID(int buyerID)
+SoldItem Sget_item_by_buyerID(int buyerID);
 //gets number of bid items
 int get_bid_item_num();
 #endif /*__FILEMANAGER_H__*/

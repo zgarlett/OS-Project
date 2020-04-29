@@ -2,3 +2,5 @@
 main
 server
 client
+*.h~
+*.c~

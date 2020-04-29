@@ -13,6 +13,7 @@
 #include <fcntl.h>		// for file control options
 #include <errno.h>		// for system error numbers
 #include <mqueue.h>
+#include "fileManager.h"
 
 #ifndef __SERVER_H__
 #define __SERVER_H__

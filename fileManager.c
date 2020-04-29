@@ -109,7 +109,7 @@ BidItem bget_item_by_id(int itemID)
 //really bad if it gets here will most likely give random answers ~~~~ 
     fclose(fp);
 
-    return item[ID];
+    return item;
 }
 
 SoldItem readfb(int ID)
@@ -168,7 +168,7 @@ SoldItem Sget_item_by_id(int itemID){
 //just like above really bad if it hits this since there are no catches. 
     fclose(fp);
 
-    return item[ID];
+    return item;
 }
 //can only get one item at a time. DONT GIVE USER OPTION TO BUY ANYTHING BUT THE FIRST ITEM THAT COMES UP
 SoldItem Sget_item_by_buyerID(int buyerID){
@@ -198,7 +198,7 @@ SoldItem Sget_item_by_buyerID(int buyerID){
 //just like above really bad if it hits this since there are no catches. 
     fclose(fp);
 
-    return item[ID];
+    return item;
 }
 //Takes in, and prints a BidItem to FILE A
 void writefa(BidItem item)
@@ -235,7 +235,7 @@ void writefb(SoldItem item)
 }
 void testCreate()
 {
-
+    int IDcheck;
     //Creates, writes, then reads back a test BidItem
     BidItem test = {IDcheck, "TestName", 1, 1, "MM/DD/YYYY", "Merchant Information"};
     IDcheck++;
