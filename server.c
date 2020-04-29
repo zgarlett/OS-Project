@@ -91,10 +91,10 @@ void* serverStart(void *vargs)
 			int buyer_or_seller = 2;
 			
 			//gets id and checks if it exists returns only if ID found atm
-			int userID = checkID(buyer_or_seller);
+			//int userID = checkID(buyer_or_seller);
 			
 			//gets the client associated with the ID
-			Client client = findID(userID);
+			//Client client = findID(userID);
 		
 			//Flags used for accepting client input properly, below is set when preparing to read a numeric input (bid amount) from the client
 			int bidFlag = 0;
@@ -108,6 +108,7 @@ void* serverStart(void *vargs)
 			char itemName[16];
 			float bidAmount;
 			while(1){
+				if(buyer_or_seller == 2){
 				//Receive clients input here
 				recv(newSocket, buffer, 1024, 0);
 				//Then compare the input and perform the correct result
@@ -135,6 +136,7 @@ void* serverStart(void *vargs)
 					send(newSocket, buffer, strlen(buffer), 0);
 					bzero(buffer, sizeof(buffer));
 				}
+				
 				else
 				{
 					printf("Client: %s\n", buffer);
@@ -142,9 +144,12 @@ void* serverStart(void *vargs)
 					send(newSocket, buffer, strlen(buffer), 0);
 					bzero(buffer, sizeof(buffer));
 				}
+				}
+				
 				//~~~~~~~~~~~~~~~~~BUYER AREA~~~~~~~~~~~~~~~~~~~
 				//When bid flag is enabled, next input will be registered as bid amount
 				if(buyer_or_seller == 0){
+					recv(newSocket, buffer, 1024, 0);
 					if(isNumeric(buffer) && bidFlag == 1)
 					{
 						char tempString[180];
@@ -160,14 +165,14 @@ void* serverStart(void *vargs)
 
 						//Then we would want to pass off the data to a bidding function that will check for closing time, and register the bid.
 					}
-					if(strcmp(buffer, "buy") == 0)
+					else if(strcmp(buffer, "buy") == 0)
 					{
 						//TODO this wont work fix this 
 						//find_item_by_userID(userID);
 					}
 
 					//When bid name flag has been set, server will attempt to read in the item name, and save it temporarily.
-					if(bidName == 1)
+					else if(bidName == 1)
 					{
 						//TODO we need to send out a list of items to them then accept an input. Might be better to do this based on item ID for ease of use and checking
 						//Now we would need to check if item name exists here, for now we will simply accept the input
@@ -179,7 +184,7 @@ void* serverStart(void *vargs)
 						printf("Item name accepted, checking for next argument (amount) \n");
 					}
 
-					if(strcmp(buffer, "bid") == 0)
+					else if(strcmp(buffer, "bid") == 0)
 					{
 						//Server has picked up the bid argument, it will expect some more arguments (the item ID) to arrive as well, it will see if it picks up, and if not
 						//alert the user that they did not enter their item id
@@ -219,7 +224,7 @@ void* serverStart(void *vargs)
 						//Set flag to look for item name next.
 						bidName = 1;
 					}
-					if(strcmp(buffer, "list") == 0)
+					else if(strcmp(buffer, "list") == 0)
 					{
 						//TODO send statement here waiting on other dude
 						//"Commands: exit, bid"
@@ -237,6 +242,7 @@ void* serverStart(void *vargs)
 				//~~~~~~~~~~~~~~SELLER AREA~~~~~~~~~~~~~~~~~
 				//Seller function, to request the removal of an item, we will need a function to process this.
 				if(buyer_or_seller == 1){
+					recv(newSocket, buffer, 1024, 0);
 					if(strcmp(buffer, "remove") == 0)
 					{
 						//Need method that will process the input, will need to implement another flag to get the input as well probably.
@@ -271,7 +277,7 @@ void* serverStart(void *vargs)
 			listenMessageServer((void *) port);
 		}
 	}
-	close(newSocket);
+	//close(newSocket);
 }
 //this should be unused 
 int buy_or_sell_test(){

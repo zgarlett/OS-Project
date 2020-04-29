@@ -22,7 +22,7 @@ void connectToServer(){
     struct sockaddr_in serverAddr;
     char buffer[1024];
 	char answer[1024];
-	int ports[4] = {8081,8182,8183,8184};
+	int ports[4] = {8181,8182,8183,8184};
 	int portPosition = 0;
 
 	//Create socket for the client
