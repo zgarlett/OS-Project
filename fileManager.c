@@ -233,6 +233,33 @@ void writefb(SoldItem item)
     fprintf(fp, "%d\t%s\t%f\t%d\t%s\n",  item.soldID, item.buyInformation, item.buyingPrice, item.center, item.purchaseDate);
     fclose(fp);
 }
+//method to find # of items a user can buyInformation
+int get_user_buy_item_num(int userID)
+{
+	SoldItem item[100];
+
+    FILE *fp;
+    fp = fopen("FILE_B.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+    int i = 0;
+	int count = 0;
+    while (!feof(fp))
+    {
+        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
+		if(item.buyerID == userID){
+			count++;
+		}
+        i++;
+    }
+
+
+    fclose(fp);
+
+    return count;
+}
 void testCreate()
 {
     int IDcheck;

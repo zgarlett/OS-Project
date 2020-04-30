@@ -32,6 +32,7 @@ typedef struct{
 	int num_items_buying;
 }Client;
 
+//using kyles bidItems struct from fileManager.H
 typedef struct{
 	int itemID;
 	int sellerID;
@@ -54,9 +55,12 @@ int check_buy_or_bid();
 //if seller check add or remove
 int check_add_or_remove();
 //adds item to list
-Item create_item(int userID);
+Item create_item(int userID, int socket);
 //finds item by itemID
 Item find_item_by_itemID(int itemID);
 //find item by userID
+
+//print current items
+print_current_items();
 #endif /*__SERVER_H__*/
 

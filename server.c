@@ -109,41 +109,41 @@ void* serverStart(void *vargs)
 			float bidAmount;
 			while(1){
 				if(buyer_or_seller == 2){
-				//Receive clients input here
-				recv(newSocket, buffer, 1024, 0);
-				//Then compare the input and perform the correct result
-				//Disconnect from client when "exit" is received.
-				if(strcmp(buffer, "exit") == 0){
-					printf("Disconnected from a client\n");
-					break;
-				}
-				//When server receives buyer, we can mark the client down as a buyer, able to be changed.
-				if(strcmp(buffer, "buyer") == 0)
-				{
-					buyer_or_seller = 0;
-					strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a buyer, please type 'seller' if you would like to change type");
-					send(newSocket, buffer, strlen(buffer), 0);
-					//Clean out buffer
-					bzero(buffer, sizeof(buffer));
+					//Receive clients input here
+					recv(newSocket, buffer, 1024, 0);
+					//Then compare the input and perform the correct result
+					//Disconnect from client when "exit" is received.
+					if(strcmp(buffer, "exit") == 0){
+						printf("Disconnected from a client\n");
+						break;
+					}
+					//When server receives buyer, we can mark the client down as a buyer, able to be changed.
+					if(strcmp(buffer, "buyer") == 0)
+					{
+						buyer_or_seller = 0;
+						strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a buyer, please type 'seller' if you would like to change type");
+						send(newSocket, buffer, strlen(buffer), 0);
+						//Clean out buffer
+						bzero(buffer, sizeof(buffer));
 
-					//Then we can go ahead and see what the buyer wants
-				}
-				//When server receives seller, we can mark the client down as a seller, able to be changed.
-				if(strcmp(buffer, "seller") == 0)
-				{
-					buyer_or_seller = 1;
-					strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a seller, please type 'buyer' if you would like to change type");
-					send(newSocket, buffer, strlen(buffer), 0);
-					bzero(buffer, sizeof(buffer));
-				}
-				
-				else
-				{
-					printf("Client: %s\n", buffer);
-					strcpy(buffer, "Please indicate either buyer or seller");
-					send(newSocket, buffer, strlen(buffer), 0);
-					bzero(buffer, sizeof(buffer));
-				}
+						//Then we can go ahead and see what the buyer wants
+					}
+					//When server receives seller, we can mark the client down as a seller, able to be changed.
+					if(strcmp(buffer, "seller") == 0)
+					{
+						buyer_or_seller = 1;
+						strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a seller, please type 'buyer' if you would like to change type");
+						send(newSocket, buffer, strlen(buffer), 0);
+						bzero(buffer, sizeof(buffer));
+					}
+					
+					else
+					{
+						printf("Client: %s\n", buffer);
+						strcpy(buffer, "Please indicate either buyer or seller");
+						send(newSocket, buffer, strlen(buffer), 0);
+						bzero(buffer, sizeof(buffer));
+					}
 				}
 				
 				//~~~~~~~~~~~~~~~~~BUYER AREA~~~~~~~~~~~~~~~~~~~
@@ -167,8 +167,18 @@ void* serverStart(void *vargs)
 					}
 					else if(strcmp(buffer, "buy") == 0)
 					{
-						//TODO this wont work fix this 
-						//find_item_by_userID(userID);
+						//TODO 
+						//number of items to buy
+						int buynum = get_user_buy_item_num(userID);
+						if(buynum > 0){
+							for(int i= 0; i< buynum;i++){
+								
+							}
+						}else{
+							strcpy(buffer, "There are no items for you to buy!");
+							send(newSocket, buffer,strlen(buffer), 0);
+							bzero(buffer, sizeof(buffer));
+						}
 					}
 
 					//When bid name flag has been set, server will attempt to read in the item name, and save it temporarily.
@@ -192,35 +202,14 @@ void* serverStart(void *vargs)
 						strcpy(buffer, "Here are all the items available for bidding:");
 						send(newSocket,buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
-						//"%d\t%s\t%d\t%f\t%s\t%s\n", item.bidID, item.itemName, item.itemQuantity, item.startingBid, item.bidEndDate, item.merchantInformation)
-						//creating for loop to send out items.
-						BidItem item;
-						int num = get_bid_item_num();
-						for(int i = 0;i < num; i++){
-							item = readfa(i);
-							char tempString[128];
-							sprintf(tempString, "Item ID: %d", item.itemID);
-							strcpy(buffer, tempString);
-							send(newSocket,buffer,strlen(buffer),0);
-							bzero(buffer, sizeof(buffer));
-							
-							sprintf(tempString, "Item Name: %s", item.itemName);
-							strcpy(buffer, tempString);
-							send(newSocket,buffer,strlen(buffer),0);
-							bzero(buffer, sizeof(buffer));
-
-							sprintf(tempString, "Starting Bid: %f", item.startingBid);
-							strcpy(buffer, tempString);
-							send(newSocket,buffer,strlen(buffer),0);
-							bzero(buffer, sizeof(buffer));
-							
-							sprintf(tempString, "Bid End Date: %s", item.bidEndDate);
-							strcpy(buffer, tempString);
-							send(newSocket,buffer,strlen(buffer),0);
-							bzero(buffer, sizeof(buffer));
-						}
-						//TODO fix this in a min
+						print_current_items();
+						
+						strcpy(buffer, "What is the item ID of what you would like to bid on");
+						send(newSocket,buffer,strlen(buffer),0);
+						bzero(buffer, sizeof(buffer));
 						recv(newSocket, buffer, 1024, 0);
+						itemID = atoi(buffer);
+						
 						//Set flag to look for item name next.
 						bidName = 1;
 					}
@@ -246,10 +235,12 @@ void* serverStart(void *vargs)
 					if(strcmp(buffer, "remove") == 0)
 					{
 						//Need method that will process the input, will need to implement another flag to get the input as well probably.
+						///~!~~~~~~~~~~~~~~~~~heere~~~~~~~~~~~~~~~~
 					}
 					if(strcmp(buffer, "sell") == 0)
 					{
 						//add item
+						create_item(userID, newSocket);
 						
 					}
 					if(strcmp(buffer, "list") == 0)
@@ -279,6 +270,41 @@ void* serverStart(void *vargs)
 	}
 	//close(newSocket);
 }
+void print_current_items(){
+	BidItem item;
+	char buffer[1024];
+	int num = get_bid_item_num();
+	for(int i = 0;i < num; i++){
+		item = readfa(i);
+		char tempString[128];
+		sprintf(tempString, "Item ID: %d", item.itemID);
+		strcpy(buffer, tempString);
+		send(newSocket,buffer,strlen(buffer),0);
+		bzero(buffer, sizeof(buffer));
+		
+		sprintf(tempString, "Item Name: %s", item.itemName);
+		strcpy(buffer, tempString);
+		send(newSocket,buffer,strlen(buffer),0);
+		bzero(buffer, sizeof(buffer));
+
+		sprintf(tempString, "Starting Bid: %f", item.startingBid);
+		strcpy(buffer, tempString);
+		send(newSocket,buffer,strlen(buffer),0);
+		bzero(buffer, sizeof(buffer));
+		
+		sprintf(tempString, "Bid End Date: %s", item.bidEndDate);
+		strcpy(buffer, tempString);
+		send(newSocket,buffer,strlen(buffer),0);
+		bzero(buffer, sizeof(buffer));
+	}
+}
+void print_item(){
+	SoldItem item;
+	char buffer[1024];
+	////~!~~~~~~~~~~~~~~~~~heere~~~~~~~~~~~~~~~~
+	
+}
+
 //this should be unused 
 int buy_or_sell_test(){
 	int buyer_or_seller = 0;
@@ -319,26 +345,61 @@ Item find_item_by_itemID(int itemID){
 	//TODO this will probs be needed for confirming and stuff
 }
 //adds item to file
-Item create_item(int userID){
+void create_item(int userID, int socket){
+	char buffer[1024];
 	int itemID = 0;
 	char name[20];
-	double startprice = 0;
-	//not putting checks here cause thats work and we can polish later
-	//get item id
-	printf("What is the ID of your item?\n");
-	scanf("%d",&itemID);
+	float startprice = 0;
+	int endtime = 0;
+	time_t now = time(0);
+	char merchinfo[100];
+	
+	//get itemID
+	strcpy(buffer,"Please enter the itemID");
+	send(socket, buffer,strlen(buffer),0);
+	bzero(buffer, sizeof(buffer));
+	recv(socket, buffer, 1024, 0);
+	itemID = atoi(buffer);
+	bzero(buffer, sizeof(buffer));
+	printf("ItemID: %d\n",itemID);
+	
 	//get name of item
-	printf("What is the name of your item?\n");
-	scanf("%s",name);
+	strcpy(buffer,"Please enter the item name");
+	send(socket, buffer,strlen(buffer),0);
+	bzero(buffer, sizeof(buffer));
+	recv(socket, buffer, 1024, 0);
+	strcpy = (name, buffer);
+	bzero(buffer, sizeof(buffer));
+	printf("Item Name: %s\n",name);
+	
 	//get start price
-	printf("What is the start price of the item?\n");
-	scanf("%lf",&startprice);
-	Item item;
+	strcpy(buffer,"Please enter the starting bid price");
+	send(socket, buffer,strlen(buffer),0);
+	bzero(buffer, sizeof(buffer));
+	recv(socket, buffer, 1024, 0);
+	startprice = atof(buffer);
+	bzero(buffer, sizeof(buffer));
+	printf("Item startprice: %f\n",startprice);
+	
+	//get end time
+	strcpy(buffer,"Please enter the amount of time in minutes from now you want the bidding to end on this item");
+	send(socket, buffer,strlen(buffer),0);
+	bzero(buffer, sizeof(buffer));
+	recv(socket, buffer, 1024, 0);
+	endtime = atoi(buffer);
+	endtime = now + (endtime * 60);
+	bzero(buffer, sizeof(buffer));
+	printf("item start time: %f\n",now);
+	printf("Item endtime: %f\n",endtime);
+	
+	BidItem item;
 	item.itemID = itemID;
-	item.name = &name;
-	item.startprice = startprice;
+	strcpy(item.itemName,name);
+	item.startingBid = startprice;
 	item.sellerID = userID;
-	return item;
+	item.bidEndDate = endtime; 
+	strcpy(item.merchantInformation, merchinfo);
+	writefa(item);
 }
 //method for checking ID
 //doesn't use the buyer_or_seller method but I included because it might be useful depending on how we save clients.

@@ -27,9 +27,11 @@ typedef struct{
     int bidID;
 	int itemID;
     char itemName[50];
+	//probs dont need quantity
     int itemQuantity;
     float startingBid;
-    char bidEndDate[50];
+	//how tf do we deal with bid end date?
+    int bidEndDate;
     char merchantInformation[50];
 }BidItem;
 
@@ -61,4 +63,6 @@ SoldItem Sget_item_by_id(int itemID);
 SoldItem Sget_item_by_buyerID(int buyerID);
 //gets number of bid items
 int get_bid_item_num();
+//gets the number of available items to buyInformation
+int get_user_buy_item_num(int userID);
 #endif /*__FILEMANAGER_H__*/
