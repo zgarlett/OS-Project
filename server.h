@@ -55,12 +55,14 @@ int check_buy_or_bid();
 //if seller check add or remove
 int check_add_or_remove();
 //adds item to list
-Item create_item(int userID, int socket);
+void create_item(int userID, int socket);
 //finds item by itemID
 Item find_item_by_itemID(int itemID);
 //find item by userID
 
 //print current items
-print_current_items();
+void print_current_items(int newSocket);
+//print an item from the sellers list
+void print_item(int itemID,int newSocket);
 #endif /*__SERVER_H__*/
 

@@ -26,6 +26,7 @@
 typedef struct{
     int bidID;
 	int itemID;
+	int sellerID;
     char itemName[50];
 	//probs dont need quantity
     int itemQuantity;
@@ -37,7 +38,9 @@ typedef struct{
 
 typedef struct{
     int soldID;
+	int itemID;
 	int buyerID;
+	char itemName[50];
     char buyInformation[50];
     float buyingPrice;
     int center;
@@ -65,4 +68,10 @@ SoldItem Sget_item_by_buyerID(int buyerID);
 int get_bid_item_num();
 //gets the number of available items to buyInformation
 int get_user_buy_item_num(int userID);
+//remove item from FILE B
+void Sremove_item(int itemID);
+//remove item from FILE A
+void Bremove_item(int itemID);
+//runs through File A and find's what user is selling for removal
+int Bget_item_by_sellerID(int sellerID);
 #endif /*__FILEMANAGER_H__*/

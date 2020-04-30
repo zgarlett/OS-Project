@@ -37,8 +37,6 @@ BidItem readfa(int ID)
     {
         printf("Error opening file from read()\n");
     }
-
-
     int i = 0;
 
     while (!feof(fp))
@@ -249,17 +247,111 @@ int get_user_buy_item_num(int userID)
     while (!feof(fp))
     {
         fread(&item[i], sizeof(item[i]) + 1, 1, fp);
-		if(item.buyerID == userID){
+		if(item->buyerID == userID){
 			count++;
 		}
         i++;
     }
-
-
     fclose(fp);
 
     return count;
 }
+//finds item with matching sellerID in FILEA returns itemID
+int Bget_item_by_sellerID(int sellerID){
+	BidItem item;
+    FILE *fp;
+    fp = fopen("FILE_A.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+    int i = 0;
+    while (!feof(fp))
+    {
+        fread(&item, sizeof(item) + 1, 1, fp);
+		if(item.sellerID == sellerID){
+			fclose(fp);
+			return item.sellerID;
+		}
+        i++;
+    }
+
+//really bad if it gets here will most likely give random answers ~~~~ 
+    fclose(fp);
+    return item.itemID;
+}
+void Sremove_item(int itemID){
+	SoldItem item[100];
+	FILE *fp;
+	fp = fopen("FILE_B.bin", "ab+");
+    FILE *fpreplace;
+    fpreplace = fopen("FILE_B_Temporary.bin", "wb");
+    int i = 0;
+	//While reading through File A, If an ID matches the delete ID, dont copy it
+    //Otherwise, copy file to file a temporary then delete File A and rename new file to file A
+	while (!feof(fp))
+    {
+        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
+
+        if (itemID == item[i].itemID)
+        {
+            continue;
+        }
+        else
+        {
+            fwrite(&item[i], sizeof(item[i]) + 1, 1, fpreplace);
+        }
+        i++; 
+    }
+	//Delete old file
+        if (remove("FILE_B.bin") == 0)
+        {
+            printf("Item deleted, and old FILE_B.bin deleted");
+        }
+        else
+        {
+                printf("Error deleting FILE_B.bin");
+
+        }
+        //Rename new file to match
+        rename("FILE_B_Temporary.bin", "FILE_B.bin");
+}
+void Bremove_item(int itemID){
+	BidItem item[100];
+	FILE *fp;
+	fp = fopen("FILE_A.bin", "ab+");
+    FILE *fpreplace;
+    int i = 0;
+    fpreplace = fopen("FILE_A_Temporary.bin", "wb");
+	//While reading through File A, If an ID matches the delete ID, dont copy it
+    //Otherwise, copy file to file a temporary then delete File A and rename new file to file A
+	while (!feof(fp))
+    {
+        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
+
+        if (itemID == item[i].itemID)
+        {
+            continue;
+        }
+        else
+        {
+            fwrite(&item[i], sizeof(item[i]) + 1, 1, fpreplace);
+        }
+        i++; 
+    }
+	//Delete old file
+        if (remove("FILE_A.bin") == 0)
+        {
+            printf("Item deleted, and old FILE_A.bin deleted");
+        }
+        else
+        {
+                printf("Error deleting FILE_A.bin");
+
+        }
+        //Rename new file to match
+        rename("FILE_A_Temporary.bin", "FILE_A.bin");
+}/*
 void testCreate()
 {
     int IDcheck;
@@ -271,7 +363,7 @@ void testCreate()
     //struct BidItem temp = read(IDcheck-1);
     //printf("Test: %d\t%s\t%d\t%f\t%s\t%s\n", temp.bidID, temp.itemName, temp.itemQuantity, temp.startingBid, temp.bidEndDate, temp.merchantInformation);
 
-}
+}*/
 /*
 int main()
 {
