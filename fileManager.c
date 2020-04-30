@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <semaphore.h>
 #include "fileManager.h"
+#include "main.h"
+
 
 //Tyler Porter
 //Project
@@ -14,15 +17,19 @@
 //??Make a method to populate an array of BidItem structs for easier file management
 
 //~~~wut is dis?
+//This is only necessary for testCreate.
+//It auto increments test values to print to FILE_A
 //int IDcheck;
 //----------------
 /*Starkey's change list
 * Moved everything that needed to be in the .h file to that
 * Created new method: basically same as readfa but takes item ID and returns the match
-* Created new method: Also same as above but for readfb/sold items (uses soldID) 
+* Created new method: Also same as above but for readfb/sold items (uses soldID)
 * Created new method: gets soldItems by buyerID
 * Created new method: Gets total number of items in file A
 */
+
+//Global Variables & Data
 
 //Item ID - Item Name - Item quantity - starting bid - bid end date - merchant info \n
 //Given an ID, this method will return a struct of all info related to item
@@ -95,7 +102,7 @@ BidItem bget_item_by_id(int itemID)
 
     while (!feof(fp))
     {
-		
+
         fread(&item, sizeof(item) + 1, 1, fp);
 		if(item.itemID == itemID){
 			fclose(fp);
@@ -104,7 +111,7 @@ BidItem bget_item_by_id(int itemID)
         i++;
     }
 
-//really bad if it gets here will most likely give random answers ~~~~ 
+//really bad if it gets here will most likely give random answers ~~~~
     fclose(fp);
 
     return item;
@@ -163,7 +170,7 @@ SoldItem Sget_item_by_id(int itemID){
         i++;
     }
 
-//just like above really bad if it hits this since there are no catches. 
+//just like above really bad if it hits this since there are no catches.
     fclose(fp);
 
     return item;
@@ -193,7 +200,7 @@ SoldItem Sget_item_by_buyerID(int buyerID){
         i++;
     }
 
-//just like above really bad if it hits this since there are no catches. 
+//just like above really bad if it hits this since there are no catches.
     fclose(fp);
 
     return item;
@@ -202,6 +209,10 @@ SoldItem Sget_item_by_buyerID(int buyerID){
 void writefa(BidItem item)
 {
     BidItem temp = item;
+    
+    //CRITICAL SECTION WRITING TO FILE
+    //sem wait will wait until filealock is available and grab it
+    sem_wait(&filealock);
     FILE *fp;
     fp = fopen("FILE_A.bin", "a+");
     if (fp == NULL)
@@ -214,10 +225,18 @@ void writefa(BidItem item)
 
     //fprintf(fp, "%d\t%s\t%d\t%f\t%s\t%s\n", item.bidID, item.itemName, item.itemQuantity, item.startingBid, item.bidEndDate, item.merchantInformation);
     fclose(fp);
+    
+    //END CRITICAL SECTION
+    //sem post releases the filealock
+    sem_post(&filealock);
 }
 //Takes a SoldItem as a parameter and prints it to File B
 void writefb(SoldItem item)
 {
+    
+    //CRITICAL SECTION WRITING TO FILE
+    //sem wait will wait until filealock is available and grab it
+    sem_wait(&filealock);
     FILE *fp;
     fp = fopen("FILE_B.bin", "a+");
     if (fp == NULL)
@@ -230,6 +249,10 @@ void writefb(SoldItem item)
 
     fprintf(fp, "%d\t%s\t%f\t%d\t%s\n",  item.soldID, item.buyInformation, item.buyingPrice, item.center, item.purchaseDate);
     fclose(fp);
+    
+    //END CRITICAL SECTION
+    //sem post releases the filealock
+    sem_post(&fileblock);
 }
 //method to find # of items a user can buyInformation
 int get_user_buy_item_num(int userID)
@@ -371,19 +394,14 @@ int main()
     FILE *fp;
     fp = fopen("FILE_A.bin", "w");
     fclose(fp);
-
-
-
     //ID check generates sequential ID's for items made in testCreate
     IDcheck = 1;
     for (int i = 0; i < 30; i++)
     {
         testCreate();
     }
-
     //More testing to try and read something from file
     struct BidItem temp;
     temp = readfa(20);
     printf("Test: %d\t%s\t%d\t%f\t%s\t%s\n", temp.bidID, temp.itemName, temp.itemQuantity, temp.startingBid, temp.bidEndDate, temp.merchantInformation);
-
 }*/

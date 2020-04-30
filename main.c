@@ -8,6 +8,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include "server.h"
+#include <semaphore.h>
+
+//semaphores for file a and b write access
+sem_t filealock;
+sem_t fileblock;
 
 int ports[4] = {8181,8182,8183,8184};
 
@@ -37,5 +42,10 @@ int main(int argc, char const *argv[]){
         serverStart((void *) &ports[3]);
     }
     */
+    
+    //Destroys Semaphores once done
+    sem_destroy(&filealock);
+    sem_destroy(&filealock);
+
     return 0;
 }
