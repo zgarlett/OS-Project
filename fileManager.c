@@ -27,6 +27,7 @@
 * Created new method: Also same as above but for readfb/sold items (uses soldID)
 * Created new method: gets soldItems by buyerID
 * Created new method: Gets total number of items in file A
+* I made many other methods but stopped writing them down check filemanager.h for full list
 */
 
 //Global Variables & Data

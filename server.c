@@ -522,7 +522,7 @@ void create_item(int userID, int socket){
 	strcpy(item.merchantInformation, merchinfo);
 	writefa(item);
 }
-//method for checking ID
+//method for checking ID (unused)
 //doesn't use the buyer_or_seller method but I included because it might be useful depending on how we save clients.
 int checkID(int buyer_or_seller){
 //this method assumes the user has an ID there is no exit without one
