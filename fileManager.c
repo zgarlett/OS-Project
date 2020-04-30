@@ -3,6 +3,8 @@
 #include <string.h>
 #include <semaphore.h>
 #include "fileManager.h"
+#include "main.h"
+
 
 //Tyler Porter
 //Project
