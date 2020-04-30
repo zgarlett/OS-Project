@@ -336,7 +336,7 @@ void* serverStart(void *vargs)
 			//To send a message to each server use the method sendMessageToServers(char * message)
 			//Depending on the message the server will read FILE_A and FILE_B again, or send messages to all clients
 			//How are we going to keep track of all the clients???
-			listenMessageServer((void *) (intptr_t) port);
+			listenMessageServer((void *) (intptr_t) &port);
 		}
 	}
 	//close(newSocket);
