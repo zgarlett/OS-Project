@@ -129,7 +129,9 @@ void* serverStart(void *vargs)
 					if(strcmp(buffer, "buyer") == 0)
 					{
 						buyer_or_seller = 0;
-						strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a buyer");
+						char tempString[180];
+						sprintf(tempString, "Thank you for connecting to the server, you have indicated you are a buyer");
+						strcpy(buffer, tempString);
 						send(newSocket, buffer, strlen(buffer), 0);
 						//Clean out buffer
 						bzero(buffer, sizeof(buffer));
@@ -140,14 +142,18 @@ void* serverStart(void *vargs)
 					if(strcmp(buffer, "seller") == 0)
 					{
 						buyer_or_seller = 1;
-						strcpy(buffer, "Thank you for connecting to the server, you have indicated you are a seller");
+						char tempString[180];
+						sprintf(tempString,"Thank you for connecting to the server, you have indicated you are a seller");
+						strcpy(buffer, tempString);
 						send(newSocket, buffer, strlen(buffer), 0);
 						bzero(buffer, sizeof(buffer));
 					}
 					else
 					{
 						printf("Client: %s\n", buffer);
-						strcpy(buffer, "Please indicate either buyer or seller");
+						char tempString[180];
+						sprintf(tempString,"Please indicate either buyer or seller");
+						strcpy(buffer, tempString);
 						send(newSocket, buffer, strlen(buffer), 0);
 						bzero(buffer, sizeof(buffer));
 					}
@@ -255,12 +261,16 @@ void* serverStart(void *vargs)
 						//Server has picked up the bid argument, it will expect some more arguments (the item ID) to arrive as well, it will see if it picks up, and if not
 						//alert the user that they did not enter their item id
 						printf("Received bid, checking for next argument (name)\n.");
-						strcpy(buffer, "Here are all the items available for bidding:");
+						char tempString[128];
+						sprintf(tempString, "Here are all the items available for bidding:");
+						strcpy(buffer, tempString);
 						send(newSocket,buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 						print_current_items(newSocket);
 						
-						strcpy(buffer, "What is the item ID of what you would like to bid on");
+						bzero(tempString, sizeof(tempString));
+						sprintf(tempString, "What is the item ID of what you would like to bid on");
+						strcpy(buffer,tempString);
 						send(newSocket,buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 						recv(newSocket, buffer, 1024, 0);
@@ -273,13 +283,17 @@ void* serverStart(void *vargs)
 					{
 						//TODO send statement here waiting on other dude
 						//"Commands: exit, bid"
-						strcpy(buffer,"Commands: list, exit, bid");
+						char tempString[128];
+						sprintf(tempString, "Commands: list, exit, bid");
+						strcpy(buffer,tempString);
 						send(newSocket, buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 					}
 					else
 					{
-						strcpy(buffer,"I didn't recognize that. Commands are: list, exit, bid");
+						char tempString[128];
+						sprintf(tempString, "I didn't recognize that. Commands are: list, exit, bid");
+						strcpy(buffer,tempString);
 						send(newSocket, buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 					}
@@ -293,7 +307,8 @@ void* serverStart(void *vargs)
 					{
 						//Need method that will process the input, will need to implement another flag to get the input as well probably.
 						//~!~~~~~~~~~~~~~~~~~here~~~~~~~~~~~~~~~~
-						char tempString[128];
+						
+						bzero(tempString, sizeof(tempString));
 						sprintf(tempString, "Are you sure you want to remove your current item? type(yes or no)");
 						strcpy(buffer, tempString);
 						send(newSocket,buffer,strlen(buffer),0);
@@ -318,13 +333,18 @@ void* serverStart(void *vargs)
 					{
 						//TODO send statement here waiting on other dude
 						//"Commands: exit, bid"
-						strcpy(buffer,"Commands: list, exit, sell, remove");
+						
+						bzero(tempString, sizeof(tempString));
+						sprintf(tempString, "Commands: list, exit, sell, remove");
+						strcpy(buffer,tempString);
 						send(newSocket, buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 					}
 					else
 					{
-						strcpy(buffer,"I didn't recognize that. Commands are: list, exit, sell, remove");
+						bzero(tempString, sizeof(tempString));
+						sprintf(tempString, "I didn't recognize that. Commands are: list, exit, sell, remove");
+						strcpy(buffer,tempString);
 						send(newSocket, buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 					}
@@ -445,42 +465,51 @@ void create_item(int userID, int socket){
 	int endtime = 0;
 	time_t now = time(0);
 	char merchinfo[100];
+	char tempString[128];
 	
 	//get itemID
-	strcpy(buffer,"Please enter the itemID");
+	sprintf(tempString, "Please enter the itemID");
+	strcpy(buffer,tempString);
 	send(socket, buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));
 	recv(socket, buffer, 1024, 0);
 	itemID = atoi(buffer);
 	bzero(buffer, sizeof(buffer));
+	bzero(tempString, sizeof(tempString));
 	printf("ItemID: %d\n",itemID);
 	
 	//get name of item
-	strcpy(buffer,"Please enter the item name");
+	sprintf(tempString, "Please enter the item name");
+	strcpy(buffer,tempString);
 	send(socket, buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));
 	recv(socket, buffer, 1024, 0);
 	strcpy(name, buffer);
 	bzero(buffer, sizeof(buffer));
+	bzero(tempString, sizeof(tempString));
 	printf("Item Name: %s\n",name);
 	
 	//get start price
-	strcpy(buffer,"Please enter the starting bid price");
+	sprintf(tempString, "Please enter the starting bid price");
+	strcpy(buffer,tempString);
 	send(socket, buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));
 	recv(socket, buffer, 1024, 0);
 	startprice = atof(buffer);
 	bzero(buffer, sizeof(buffer));
+	bzero(tempString, sizeof(tempString));
 	printf("Item startprice: %f\n",startprice);
 	
 	//get end time
-	strcpy(buffer,"Please enter the amount of time in minutes from now you want the bidding to end on this item");
+	sprintf(tempString, "Please enter the amount of time in minutes from now you want the bidding to end on this item");
+	strcpy(buffer,tempString);
 	send(socket, buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));
 	recv(socket, buffer, 1024, 0);
 	endtime = atoi(buffer);
 	endtime = now + (endtime * 60);
 	bzero(buffer, sizeof(buffer));
+	bzero(tempString, sizeof(tempString));
 	printf("item start time: %ld\n",now);
 	printf("Item endtime: %d\n",endtime);
 	
