@@ -171,6 +171,12 @@ void* serverStart(void *vargs)
 						bidFlag = 0;
 
 						//Then we would want to pass off the data to a bidding function that will check for closing time, and register the bid.
+						
+						//Get the item ID from the given name
+						int itemID = getID_by_name(itemName);
+						
+						//Send off bid for processing
+						processBid(itemID, bidAmount, userID, newSocket);
 					}
 					else if(strcmp(buffer, "buy") == 0)
 					{
@@ -563,6 +569,74 @@ int check_add_or_remove(){
 				printf("try again...\n");
 			}
 		}
+}
+
+int processBid(int itemID,  float bidAmount, int clientID, int clientSocket)
+{
+    //Get what time it currently is to compare to end time
+    time_t currentTime = time(NULL);
+
+    //Sending buffer
+    char buffer[256];
+
+    //Print out some details to server console.
+    printf("Processing Bid for item ID: %d, bid amount: %f, for clientID: %d\n", itemID, bidAmount, clientID);
+
+    //Attempt to read in the item structure from fileA
+    BidItem bidItem = readfa(itemID);
+    if(bidItem.itemName == "\0")
+    {
+        printf("Error while reading from fileA during bid processing.\n");
+        return -1;
+    }
+
+    //Determine if bid is higher than the current bid, unless currentBid is 0, in which we check the startingBid amount instead.
+    if(bidItem.currentBid == 0)
+    {
+        if(bidAmount < bidItem.startingBid)
+        {
+            //Value was less than starting bid, making it invalid.
+            printf("Lower value than starting bid received, canceling.\n");
+            strcpy(buffer, "Your bid on item ID %d was too low.\n");
+            send(clientSocket, buffer, strlen(buffer), 0);
+            return -1;
+        }
+    }
+    else if(bidAmount < bidItem.currentBid)
+        {
+            //Value was less than current bid, making it invalid.
+            printf("Lower value than starting bid received, canceling.\n");
+            strcpy(buffer, "Your bid on the item was too low.\n");
+            send(clientSocket, buffer, strlen(buffer), 0);
+            return -1;
+        }
+
+    //Bid amount checks out, continue to checking time
+
+    //Check end date to now, if we enter the if, it means the time has passed to much to bid.
+    if(bidItem.bidEndDate < currentTime)
+    {
+        printf("Received a bid too late, informing user and canceling bid processing.\n");
+        strcpy(buffer, "Your bid on the item was past the end time.\n");
+        send(clientSocket, buffer, strlen(buffer), 0);
+        return -1;
+    }
+    //Otherwise, we can continue to process the bid.
+    else
+        {
+            //Update structures values to the new bid amount, clientID for highest bid
+            bidItem.currentBid = bidAmount;
+            bidItem.bidID = clientID;
+
+            //Then we need to remove the item as is, and place in the new structure.
+            //Remove the current struct from file
+            Bremove_item(itemID);
+
+            //Then place our new struct in the file with updated information
+            writefa(bidItem);
+            return 0;
+        }
+        return 0;
 }
 
 //Needed only if we are going to use threads

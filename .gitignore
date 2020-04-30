@@ -4,3 +4,8 @@ server
 client
 *.h~
 *.c~
+.idea/misc.xml
+.idea/modules.xml
+.idea/OS-Project-New.iml
+.idea/vcs.xml
+.idea/workspace.xml

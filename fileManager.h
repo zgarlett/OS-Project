@@ -31,6 +31,7 @@ typedef struct{
 	//probs dont need quantity
     int itemQuantity;
     float startingBid;
+    float currentBid;
 	//how tf do we deal with bid end date?
     int bidEndDate;
     char merchantInformation[50];
@@ -74,4 +75,6 @@ void Sremove_item(int itemID);
 void Bremove_item(int itemID);
 //runs through File A and find's what user is selling for removal
 int Bget_item_by_sellerID(int sellerID);
+//Get an ID from a specified name
+int getID_by_name(char itemName[16]);
 #endif /*__FILEMANAGER_H__*/

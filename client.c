@@ -66,40 +66,6 @@ void connectToServer(){
         if(recv(clientSocket, buffer, 1024, 0) < 0){
             printf("Error in receiving data.\n");
         }
-	
-	    //Take in Item info and List
-	    //Will send Item struct to be written to file
-	    //Currently breaks client/server communication, commenting out
-	    /*
-        if(strcmp((recv(clientSocket, buffer, 1024, 0)), "list") == 0){
-
-            char tempchar[50];
-
-            printf("Input bidID of item.\n");
-            scanf("%s", tempchar);
-            send(clientSocket, tempchar, strlen(tempchar), 0);
-
-            printf("Input name of item.\n");
-            scanf("%s", tempchar);
-            send(clientSocket, tempchar, strlen(tempchar), 0);
-
-            printf("Input quantity of item.\n");
-            scanf("%s", tempchar);
-            send(clientSocket, tempchar, strlen(tempchar), 0);
-
-            printf("Input starting bid of item.\n");
-            scanf("%s", tempchar);
-            send(clientSocket, tempchar, strlen(tempchar), 0);
-
-            printf("Input the end date of bidding for item. MM/DD/YYYY\n");
-            scanf("%s", tempchar);
-            send(clientSocket, tempchar, strlen(tempchar), 0);
-
-            printf("Input the merchant onformation for item.\n");
-            scanf("%s", tempchar);
-            send(clientSocket, tempchar, strlen(tempchar), 0);
-        }
-	    */
         else
             {
             printf("Server: \t%s\n", buffer);

@@ -13,6 +13,7 @@
 #include <fcntl.h>		// for file control options
 #include <errno.h>		// for system error numbers
 #include <mqueue.h>
+#include <time.h>
 #include "fileManager.h"
 
 #ifndef __SERVER_H__
@@ -58,7 +59,8 @@ int check_add_or_remove();
 void create_item(int userID, int socket);
 //finds item by itemID
 Item find_item_by_itemID(int itemID);
-//find item by userID
+//Processes bid data
+int processBid(int itemID, float bidAmount, int clientID, int clientSocket);
 
 //print current items
 void print_current_items(int newSocket);

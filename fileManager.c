@@ -85,6 +85,35 @@ int get_bid_item_num()
 
 
 }
+int getID_by_name(char itemName[16])
+{
+    BidItem item;
+    FILE *fp;
+    fp = fopen("FILE_A.bin", "rb");
+    if (fp == NULL)
+    {
+        printf("Error opening file from read()\n");
+    }
+
+
+    int i = 0;
+
+    while (!feof(fp))
+    {
+
+        fread(&item, sizeof(item) + 1, 1, fp);
+		if(strcmp(item.itemName, itemName) == 0){
+			fclose(fp);
+			return item.itemID;
+		}
+        i++;
+    }
+
+//really bad if it gets here will most likely give random answers ~~~~
+    fclose(fp);
+
+    return item.itemID;
+}
 //find by itemID bid
 BidItem bget_item_by_id(int itemID)
 {
