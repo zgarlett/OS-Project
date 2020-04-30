@@ -14,6 +14,5 @@
 sem_t filealock;
 sem_t fileblock;
 
-int ports[4] = {8181,8182,8183,8184};
 
 int main(int argc, char const *argv[]);

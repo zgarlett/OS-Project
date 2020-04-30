@@ -330,7 +330,7 @@ void* serverStart(void *vargs)
 			//To send a message to each server use the method sendMessageToServers(char * message)
 			//Depending on the message the server will read FILE_A and FILE_B again, or send messages to all clients
 			//How are we going to keep track of all the clients???
-			listenMessageServer((void *) port);
+			listenMessageServer((void *) (intptr_t) port);
 		}
 	}
 	//close(newSocket);
@@ -357,7 +357,7 @@ void print_current_items(int newSocket){
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
 		
-		sprintf(tempString, "Bid End Date: %s", item.bidEndDate);
+		sprintf(tempString, "Bid End Date: %d", item.bidEndDate);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
@@ -408,10 +408,11 @@ int buy_or_sell_test(){
 	}
 }
 
+/*
 //find item by userID
 void find_item_by_userID(Client user){
 	//TODO look below at file name
-	/*gets file of users fix the below line when we know name*/
+	//gets file of users fix the below line when we know name
 	FILE *infile = fopen("SOMETHINGABOUTITEMS.TEXT","r");
 	if(infile == NULL){ printf("file wasn't loaded\n");}
 	Item item;
@@ -423,9 +424,8 @@ void find_item_by_userID(Client user){
 			printf("is this your item?\n");
 		}
 	}
-
-
 }
+*/
 //find item by ID
 Item find_item_by_itemID(int itemID){
 	//TODO this will probs be needed for confirming and stuff
@@ -475,8 +475,8 @@ void create_item(int userID, int socket){
 	endtime = atoi(buffer);
 	endtime = now + (endtime * 60);
 	bzero(buffer, sizeof(buffer));
-	printf("item start time: %f\n",now);
-	printf("Item endtime: %f\n",endtime);
+	printf("item start time: %ld\n",now);
+	printf("Item endtime: %d\n",endtime);
 	
 	BidItem item;
 	item.itemID = itemID;
@@ -524,7 +524,7 @@ Client findID(int userID){
 
 	//~~~~~~~~~This test case will need to be changed this will cause segfault we just need to figure out how we will determine total amount of users~~~~~~~~~~~~~~!
 
-	while(client.clientID != NULL){
+	while(client.clientID != userID){
 		fread(&client, sizeof(Client),1,infile);
 		counter++;
 		if(client.clientID == userID){return client;}
