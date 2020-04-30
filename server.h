@@ -19,7 +19,7 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
-
+//pretty sure both of these structs are unused code
 typedef struct{
 	
 	int index;
@@ -40,13 +40,15 @@ typedef struct{
 	char *name;
 	double startprice;
 }Item;
-	
+
+//zach's message passing	
 void * serverStart(void *vargs);
 void * listenMessageServer(void *vargs);
 void * acceptConnections(void *vargs);
 void sendMessageToServers(char * message);
 void checkRecievedMessage(char * message);
 
+//starkeys initial skeleton methods (most are no longer used)
 //checks for ID 
 int checkID(int buyer_or_seller);
 //actually finds ID

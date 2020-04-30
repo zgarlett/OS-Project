@@ -59,7 +59,7 @@ void writefb(SoldItem item);
 //no idea
 void testCreate();
 
-//new methods
+//new methods from starkeys change list
 //gets items by their itemID
 BidItem bget_item_by_id(int itemID);
 SoldItem Sget_item_by_id(int itemID);
