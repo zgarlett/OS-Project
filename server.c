@@ -186,7 +186,6 @@ void* serverStart(void *vargs)
 					}
 					else if(strcmp(buffer, "buy") == 0)
 					{
-						
 						int buynum = get_user_buy_item_num(userID);
 						SoldItem item;
 						if(buynum > 0){
@@ -218,6 +217,7 @@ void* serverStart(void *vargs)
 										//method to remove item from file B
 										Sremove_item(itemID);
 									}
+									//if no
 									if(strcmp(buffer, "no") == 0){
 										sprintf(tempString, "Don't waste my time then...");
 										strcpy(buffer, tempString);
