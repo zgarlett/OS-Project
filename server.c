@@ -518,7 +518,9 @@ void * listenMessageServer(void * vargs){
       server1 = mq_open(QUEUE_SERVER1, O_RDONLY);
       while(1){
         if(mq_receive (server1, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
-          printf("Port %d recieved: %s\n", portNum, in_buffer);
+        //Testing  
+	//printf("Port %d recieved: %s\n", portNum, in_buffer);
+		checkRecievedMessage(in_buffer);
         }
       }
     }
@@ -526,7 +528,9 @@ void * listenMessageServer(void * vargs){
       server2 = mq_open(QUEUE_SERVER2, O_RDONLY);
       while(1){
         if(mq_receive (server2, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
-          printf("Port %d recieved: %s\n", portNum, in_buffer);
+		//Testing
+          	//printf("Port %d recieved: %s\n", portNum, in_buffer);
+		checkRecievedMessage(in_buffer);
         }
       }
     }
@@ -534,7 +538,9 @@ void * listenMessageServer(void * vargs){
       server3 = mq_open(QUEUE_SERVER3, O_RDONLY);
       while(1){
         if(mq_receive (server3, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
-          printf("Port %d recieved: %s\n", portNum, in_buffer);
+		//Testing
+          	//printf("Port %d recieved: %s\n", portNum, in_buffer);
+		checkRecievedMessage(in_buffer);
         }
       }
     }
@@ -542,7 +548,9 @@ void * listenMessageServer(void * vargs){
       server4 = mq_open(QUEUE_SERVER4, O_RDONLY);
       while(1){
         if(mq_receive (server4, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
-          printf("Port %d recieved: %s\n", portNum, in_buffer);
+		//Testing
+          	//printf("Port %d recieved: %s\n", portNum, in_buffer);
+		checkRecievedMessage(in_buffer);
         }
       }
     }
