@@ -29,8 +29,9 @@
 #define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
 #define MAX 9000
 //Not sure what these are for at the moment, these I had to add to fix compiler errors.
-#define FILE_WRITTEN 1
-#define AUCTION_END 1
+#define BID_MADE "bid_made"
+#define AUCTION_END "auction_end"
+#define ITEM_ADDED "item_add"
 
 //Function to check if a char array or pointer is a number.
 int isNumeric (const char * s)
@@ -669,12 +670,15 @@ void sendMessageToServers(char * message){
 //service centers need to know about. Please use the constants at the top of the file
 void checkRecievedMessage(char * message){
 	//if the file has changed
-	if(strcmp(message,FILE_WRITTEN) == 0){
+	if(strcmp(message,BID_MADE) == 0){
 		//read file again method
 		//print to clients method
 
 		//if auction has finished
 	} else if(strcmp(message,AUCTION_END) == 0){
+		//tell all clients method
+
+	} else if(strcmp(message,ITEM_ADDED) == 0){
 		//tell all clients method
 
 	}
