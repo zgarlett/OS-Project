@@ -58,7 +58,7 @@ BidItem readfa(int ID)
 
     return item[ID];
 }
-
+//gets the itemID number of the bid item
 int get_bid_item_num()
 {
     BidItem item[100];
@@ -86,6 +86,8 @@ int get_bid_item_num()
 
 
 }
+
+//gets the item ID by the name of the item
 int getID_by_name(char itemName[16])
 {
     BidItem item;
@@ -115,7 +117,8 @@ int getID_by_name(char itemName[16])
 
     return item.itemID;
 }
-//find by itemID bid
+
+//find an item in FILE A by itemID
 BidItem bget_item_by_id(int itemID)
 {
 	BidItem item;
@@ -147,6 +150,7 @@ BidItem bget_item_by_id(int itemID)
     return item;
 }
 
+//reads all the items in FILE_B and returns a specific item
 SoldItem readfb(int ID)
 {
 
@@ -175,6 +179,7 @@ SoldItem readfb(int ID)
 
 
 }
+
 //gets sold items by their item ID
 SoldItem Sget_item_by_id(int itemID){
 
@@ -205,9 +210,9 @@ SoldItem Sget_item_by_id(int itemID){
 
     return item;
 }
-//can only get one item at a time. DONT GIVE USER OPTION TO BUY ANYTHING BUT THE FIRST ITEM THAT COMES UP
+//finds an item in file B by the buyerID
 SoldItem Sget_item_by_buyerID(int buyerID){
-
+//can only get one item at a time. DONT GIVE USER OPTION TO BUY ANYTHING BUT THE FIRST ITEM THAT COMES UP
     SoldItem item;
 
     FILE *fp;
@@ -235,6 +240,7 @@ SoldItem Sget_item_by_buyerID(int buyerID){
 
     return item;
 }
+
 //Takes in, and prints a BidItem to FILE A
 void writefa(BidItem item)
 {
@@ -333,6 +339,7 @@ int Bget_item_by_sellerID(int sellerID){
     fclose(fp);
     return item.itemID;
 }
+//removes an item from FILE_B by its itemID
 void Sremove_item(int itemID){
 	SoldItem item[100];
 	FILE *fp;
@@ -369,6 +376,7 @@ void Sremove_item(int itemID){
         //Rename new file to match
         rename("FILE_B_Temporary.bin", "FILE_B.bin");
 }
+//removes an item by its itemID in FILE_A
 void Bremove_item(int itemID){
 	BidItem item[100];
 	FILE *fp;
@@ -404,7 +412,8 @@ void Bremove_item(int itemID){
         }
         //Rename new file to match
         rename("FILE_A_Temporary.bin", "FILE_A.bin");
-}/*
+}
+/*
 void testCreate()
 {
     int IDcheck;
