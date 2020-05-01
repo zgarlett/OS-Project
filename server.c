@@ -527,6 +527,8 @@ void create_item(int userID, int socket){
 	item.bidEndDate = endtime;
 	strcpy(item.merchantInformation, merchinfo);
 	writefa(item);
+
+    sendMessageToServers(ITEM_ADDED);
 }
 //method for checking ID (unused)
 //doesn't use the buyer_or_seller method but I included because it might be useful depending on how we save clients.
@@ -669,6 +671,7 @@ int processBid(int itemID,  float bidAmount, int clientID, int clientSocket)
 
             //Then place our new struct in the file with updated information
             writefa(bidItem);
+            sendMessageToServers(ITEM_ADDED);
             return 0;
         }
         return 0;
