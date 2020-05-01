@@ -93,7 +93,6 @@ void* serverStart(void *vargs)
 		//~~is this issue?
         if((childpid = fork()) == 0){
             close(serverSocket);
-			if(childpid){
 			//buyer or seller flag: buyer = 0 | seller = 1 | 2 if not set
 			int buyer_or_seller = 2;
 
@@ -371,7 +370,6 @@ void* serverStart(void *vargs)
 				}
 			}
 		}
-	}
 
 	}
 
