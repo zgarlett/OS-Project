@@ -792,6 +792,7 @@ void checkRecievedMessage(char * message){
 
 	} else if(strcmp(message,ITEM_ADDED) == 0){
 		//tell all clients method
+        printf("Item added\n");
 
 	}
 }
