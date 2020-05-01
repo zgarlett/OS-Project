@@ -167,6 +167,10 @@ void* serverStart(void *vargs)
 				//When bid flag is enabled, next input will be registered as bid amount
 				if(buyer_or_seller == 0){
 					recv(newSocket, buffer, 1024, 0);
+					if(strcmp(buffer, "list") == 0)
+					{
+						print_current_items(newSocket);
+					}
 					if(isNumeric(buffer) && bidFlag == 1)
 					{
 						char tempString[180];
@@ -374,22 +378,22 @@ void print_current_items(int newSocket){
 	for(int i = 0;i < num; i++){
 		item = readfa(i);
 		char tempString[128];
-		sprintf(tempString, "Item ID: %d", item.itemID);
+		sprintf(tempString, "Item ID: %d\t", item.itemID);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
 
-		sprintf(tempString, "Item Name: %s", item.itemName);
+		sprintf(tempString, "Item Name: %s\t", item.itemName);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
 
-		sprintf(tempString, "Starting Bid: %f", item.startingBid);
+		sprintf(tempString, "Starting Bid: %f\t", item.startingBid);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
 
-		sprintf(tempString, "Bid End Date: %d", item.bidEndDate);
+		sprintf(tempString, "Bid End Date: %d\n", item.bidEndDate);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
@@ -527,6 +531,7 @@ void create_item(int userID, int socket){
 	item.bidEndDate = endtime;
 	strcpy(item.merchantInformation, merchinfo);
 	writefa(item);
+	
 
     sendMessageToServers(ITEM_ADDED);
 }

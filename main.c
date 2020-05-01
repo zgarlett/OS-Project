@@ -19,6 +19,8 @@ int ports[4] = {8181,8182,8183,8184};
 int main(int argc, char const *argv[]){
 
     pthread_t thread[4];
+    sem_init(&filealock, 0, 1);
+    sem_init(&fileblock, 0, 1);
     
     for(int i = 0; i < 4; i++)
     {
