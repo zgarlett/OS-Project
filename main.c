@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "server.h"
 #include <semaphore.h>
+#include <client.h>
 
 //semaphores for file a and b write access
 sem_t filealock;
