@@ -25,6 +25,10 @@ int main(int argc, char const *argv[]){
         pthread_create(&thread[i], NULL, serverStart, &ports[i]);
         printf("Port Number: %d", ports[i]);
     }
+    
+    //starts Client for testing
+    clientMain();
+    
     for(int i = 0; i < 4; i++)
     {
         pthread_join(thread[i], NULL);
