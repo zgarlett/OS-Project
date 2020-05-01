@@ -61,9 +61,13 @@ BidItem readfa(int ID)
 //gets the itemID number of the bid item
 int get_bid_item_num()
 {
+
     BidItem item[100];
 
     FILE *fp;
+    
+    
+    
     fp = fopen("FILE_A.bin", "rb");
     if (fp == NULL)
     {
@@ -341,12 +345,11 @@ int Bget_item_by_sellerID(int sellerID){
 }
 //removes an item from FILE_B by its itemID
 void Sremove_item(int itemID){
-	SoldItem item[100];
+	SoldItem item;
 	
 //CRITICAL SECTION WRITING TO FILE
     //sem wait will wait until filealock is available and grab it
     sem_wait(&fileblock);
-	
 	FILE *fp;
 	fp = fopen("FILE_B.bin", "ab+");
     FILE *fpreplace;
@@ -356,15 +359,15 @@ void Sremove_item(int itemID){
     //Otherwise, copy file to file a temporary then delete File A and rename new file to file A
 	while (!feof(fp))
     {
-        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
+        fread(&item, sizeof(item) + 1, 1, fp);
 
-        if (itemID == item[i].itemID)
+        if (itemID == item.itemID)
         {
             continue;
         }
         else
         {
-            fwrite(&item[i], sizeof(item[i]) + 1, 1, fpreplace);
+            fwrite(&item, sizeof(item) + 1, 1, fpreplace);
         }
         i++; 
     }
@@ -387,12 +390,11 @@ void Sremove_item(int itemID){
 }
 //removes an item by its itemID in FILE_A
 void Bremove_item(int itemID){
-	BidItem item[100];
+	BidItem item;
 	
 //CRITICAL SECTION WRITING TO FILE
     //sem wait will wait until filealock is available and grab it
     sem_wait(&filealock);
-	
 	FILE *fp;
 	fp = fopen("FILE_A.bin", "ab+");
     FILE *fpreplace;
@@ -402,15 +404,15 @@ void Bremove_item(int itemID){
     //Otherwise, copy file to file a temporary then delete File A and rename new file to file A
 	while (!feof(fp))
     {
-        fread(&item[i], sizeof(item[i]) + 1, 1, fp);
+        fread(&item, sizeof(item) + 1, 1, fp);
 
-        if (itemID == item[i].itemID)
+        if (itemID == item.itemID)
         {
             continue;
         }
         else
         {
-            fwrite(&item[i], sizeof(item[i]) + 1, 1, fpreplace);
+            fwrite(&item, sizeof(item) + 1, 1, fpreplace);
         }
         i++; 
     }
