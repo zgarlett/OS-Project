@@ -55,6 +55,7 @@ void* serverStart(void *vargs)
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htons(port);
 	serverAddr.sin_addr.s_addr = htons(INADDR_ANY);
+	 int pid, pid1, pid2, pid3, pid4; 
 
     if((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == 0 ){
         perror("Error creating socket\n");
@@ -89,9 +90,10 @@ void* serverStart(void *vargs)
             exit(1);
         }
         printf("Connection accepted from new client!\n");
-		//~~is this issue? {}
+		//~~is this issue?
         if((childpid = fork()) == 0){
             close(serverSocket);
+			if(childpid){
 			//buyer or seller flag: buyer = 0 | seller = 1 | 2 if not set
 			int buyer_or_seller = 2;
 
@@ -100,6 +102,7 @@ void* serverStart(void *vargs)
 
 			//gets the client associated with the ID
 			//Client client = findID(userID);
+			//bzero(buffer, sizeof(buffer));
 			char tempString2[128];
 			sprintf(tempString2, "What is your userID");
 			strcpy(buffer, tempString2);
@@ -115,7 +118,8 @@ void* serverStart(void *vargs)
 
 			//this is the ItemID of the item we are currently dealing with
 			int itemID = 0;
-
+			//first time in loop
+			int hereflag = 0; 
 			//Temporary storage variables
 			char itemName[16];
 			float bidAmount;
@@ -297,6 +301,10 @@ void* serverStart(void *vargs)
 						send(newSocket, buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 					}
+					if(strcmp(buffer, "exit") == 0){
+						printf("Disconnected from a client\n");
+						break;
+					}
 					else
 					{
 						char tempString[128];
@@ -348,6 +356,10 @@ void* serverStart(void *vargs)
 						send(newSocket, buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 					}
+					if(strcmp(buffer, "exit") == 0){
+						printf("Disconnected from a client\n");
+						break;
+					}
 					else
 					{
 						bzero(tempString, sizeof(tempString));
@@ -359,6 +371,7 @@ void* serverStart(void *vargs)
 				}
 			}
 		}
+	}
 
 	}
 
