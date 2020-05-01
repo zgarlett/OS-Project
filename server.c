@@ -77,6 +77,10 @@ void* serverStart(void *vargs)
         printf("Listening for connections\n");
     }
 
+    //Made seperate Process for handling connections
+    int firstFork = fork();
+    if(firstFork == 0) {
+
     //Infinitely accept connections while running.
     //MAIN SERVER LOOP
 	while(1){
@@ -90,10 +94,10 @@ void* serverStart(void *vargs)
             close(serverSocket);
 			//buyer or seller flag: buyer = 0 | seller = 1 | 2 if not set
 			int buyer_or_seller = 2;
-		
+
 			//gets id and checks if it exists returns only if ID found atm
 			//int userID = checkID(buyer_or_seller);
-			
+
 			//gets the client associated with the ID
 			//Client client = findID(userID);
 			char tempString2[128];
@@ -103,12 +107,12 @@ void* serverStart(void *vargs)
 			bzero(buffer, sizeof(buffer));
 			recv(newSocket, buffer, 1024, 0);
 			int userID = atoi(buffer);
-		
+
 			//Flags used for accepting client input properly, below is set when preparing to read a numeric input (bid amount) from the client
 			int bidFlag = 0;
 			//This flag is used when preparing to accept the item name to bid on.
 			int bidName = 0;
-			
+
 			//this is the ItemID of the item we are currently dealing with
 			int itemID = 0;
 
@@ -158,7 +162,7 @@ void* serverStart(void *vargs)
 						bzero(buffer, sizeof(buffer));
 					}
 				}
-				
+
 				//~~~~~~~~~~~~~~~~~BUYER AREA~~~~~~~~~~~~~~~~~~~
 				//When bid flag is enabled, next input will be registered as bid amount
 				if(buyer_or_seller == 0){
@@ -177,10 +181,10 @@ void* serverStart(void *vargs)
 						bidFlag = 0;
 
 						//Then we would want to pass off the data to a bidding function that will check for closing time, and register the bid.
-						
+
 						//Get the item ID from the given name
 						int itemID = getID_by_name(itemName);
-						
+
 						//Send off bid for processing
 						processBid(itemID, bidAmount, userID, newSocket);
 					}
@@ -198,7 +202,7 @@ void* serverStart(void *vargs)
 								bzero(buffer, sizeof(buffer));
 								print_item(item.itemID,newSocket);
 								recv(newSocket, buffer, 1024, 0);
-								
+
 								//if yes this is my item
 								if(strcmp(buffer, "yes") == 0){
 									sprintf(tempString, "Would you like to buy? type(yes or no)");
@@ -206,14 +210,14 @@ void* serverStart(void *vargs)
 									send(newSocket,buffer,strlen(buffer),0);
 									bzero(buffer, sizeof(buffer));
 									recv(newSocket, buffer, 1024, 0);
-									
+
 									//if yes going to buy
 									if(strcmp(buffer, "yes") == 0){
 										sprintf(tempString, "Your Item has been purchased");
 										strcpy(buffer, tempString);
 										send(newSocket,buffer,strlen(buffer),0);
 										bzero(buffer, sizeof(buffer));
-										//semaphore here? 
+										//semaphore here?
 										//method to remove item from file B
 										Sremove_item(itemID);
 									}
@@ -267,7 +271,7 @@ void* serverStart(void *vargs)
 						send(newSocket,buffer,strlen(buffer),0);
 						bzero(buffer, sizeof(buffer));
 						print_current_items(newSocket);
-						
+
 						bzero(tempString, sizeof(tempString));
 						sprintf(tempString, "What is the item ID of what you would like to bid on");
 						strcpy(buffer,tempString);
@@ -275,7 +279,7 @@ void* serverStart(void *vargs)
 						bzero(buffer, sizeof(buffer));
 						recv(newSocket, buffer, 1024, 0);
 						itemID = atoi(buffer);
-						
+
 						//Set flag to look for item name next.
 						bidName = 1;
 					}
@@ -307,7 +311,7 @@ void* serverStart(void *vargs)
 					{
 						//Need method that will process the input, will need to implement another flag to get the input as well probably.
 						//~!~~~~~~~~~~~~~~~~~here~~~~~~~~~~~~~~~~
-						
+
 						bzero(tempString, sizeof(tempString));
 						sprintf(tempString, "Are you sure you want to remove your current item? type(yes or no)");
 						strcpy(buffer, tempString);
@@ -327,13 +331,13 @@ void* serverStart(void *vargs)
 					if(strcmp(buffer, "sell") == 0)
 					{
 						//add item
-						create_item(userID, newSocket);	
+						create_item(userID, newSocket);
 					}
 					if(strcmp(buffer, "list") == 0)
 					{
 						//TODO send statement here waiting on other dude
 						//"Commands: exit, bid"
-						
+
 						bzero(tempString, sizeof(tempString));
 						sprintf(tempString, "Commands: list, exit, sell, remove");
 						strcpy(buffer,tempString);
@@ -351,14 +355,16 @@ void* serverStart(void *vargs)
 				}
 			}
 		}
-		else if (childpid > 0){
-			//Listen for IPC based on port passed in methdod serverStart(void * port)
-			//To send a message to each server use the method sendMessageToServers(char * message)
-			//Depending on the message the server will read FILE_A and FILE_B again, or send messages to all clients
-			//How are we going to keep track of all the clients???
-			listenMessageServer((void *) (intptr_t) &port);
-		}
+
 	}
+
+} else if (firstFork > 0){
+        //Listen for IPC based on port passed in methdod serverStart(void * port)
+        //To send a message to each server use the method sendMessageToServers(char * message)
+        //Depending on the message the server will read FILE_A and FILE_B again, or send messages to all clients
+        //How are we going to keep track of all the clients???
+        listenMessageServer((void *)  &port);
+    }
 	//close(newSocket);
 }
 void print_current_items(int newSocket){
@@ -372,7 +378,7 @@ void print_current_items(int newSocket){
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
-		
+
 		sprintf(tempString, "Item Name: %s", item.itemName);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
@@ -382,7 +388,7 @@ void print_current_items(int newSocket){
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
 		bzero(buffer, sizeof(buffer));
-		
+
 		sprintf(tempString, "Bid End Date: %d", item.bidEndDate);
 		strcpy(buffer, tempString);
 		send(newSocket,buffer,strlen(buffer),0);
@@ -399,7 +405,7 @@ void print_item(int itemID,int newSocket){
 	strcpy(buffer, tempString);
 	send(newSocket,buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));
-	
+
 	sprintf(tempString, "Item Name: %s", item.itemName);
 	strcpy(buffer, tempString);
 	send(newSocket,buffer,strlen(buffer),0);
@@ -409,15 +415,15 @@ void print_item(int itemID,int newSocket){
 	strcpy(buffer, tempString);
 	send(newSocket,buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));
-	
+
 	sprintf(tempString, "Bid End Date: %s", item.bidEndDate);
 	strcpy(buffer, tempString);
 	send(newSocket,buffer,strlen(buffer),0);
 	bzero(buffer, sizeof(buffer));*/
-	
+
 }
 
-//this should be unused 
+//this should be unused
 int buy_or_sell_test(){
 	int buyer_or_seller = 0;
 	int bORs_test = 0;
@@ -466,7 +472,7 @@ void create_item(int userID, int socket){
 	time_t now = time(0);
 	char merchinfo[100];
 	char tempString[128];
-	
+
 	//get itemID
 	sprintf(tempString, "Please enter the itemID");
 	strcpy(buffer,tempString);
@@ -477,7 +483,7 @@ void create_item(int userID, int socket){
 	bzero(buffer, sizeof(buffer));
 	bzero(tempString, sizeof(tempString));
 	printf("ItemID: %d\n",itemID);
-	
+
 	//get name of item
 	sprintf(tempString, "Please enter the item name");
 	strcpy(buffer,tempString);
@@ -488,7 +494,7 @@ void create_item(int userID, int socket){
 	bzero(buffer, sizeof(buffer));
 	bzero(tempString, sizeof(tempString));
 	printf("Item Name: %s\n",name);
-	
+
 	//get start price
 	sprintf(tempString, "Please enter the starting bid price");
 	strcpy(buffer,tempString);
@@ -499,7 +505,7 @@ void create_item(int userID, int socket){
 	bzero(buffer, sizeof(buffer));
 	bzero(tempString, sizeof(tempString));
 	printf("Item startprice: %f\n",startprice);
-	
+
 	//get end time
 	sprintf(tempString, "Please enter the amount of time in minutes from now you want the bidding to end on this item");
 	strcpy(buffer,tempString);
@@ -512,13 +518,13 @@ void create_item(int userID, int socket){
 	bzero(tempString, sizeof(tempString));
 	printf("item start time: %ld\n",now);
 	printf("Item endtime: %d\n",endtime);
-	
+
 	BidItem item;
 	item.itemID = itemID;
 	strcpy(item.itemName,name);
 	item.startingBid = startprice;
 	item.sellerID = userID;
-	item.bidEndDate = endtime; 
+	item.bidEndDate = endtime;
 	strcpy(item.merchantInformation, merchinfo);
 	writefa(item);
 }
@@ -707,7 +713,7 @@ void * listenMessageServer(void * vargs){
       server1 = mq_open(QUEUE_SERVER1, O_RDONLY);
       while(1){
         if(mq_receive (server1, in_buffer, MSG_BUFFER_SIZE, NULL) > 0){
-        //Testing  
+        //Testing
 	//printf("Port %d recieved: %s\n", portNum, in_buffer);
 		checkRecievedMessage(in_buffer);
         }
