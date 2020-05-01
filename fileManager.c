@@ -447,6 +447,23 @@ void testCreate()
 
 }*/
 /*
+void moveitem(int ID)
+{
+    //CRITICAL SECTION WRITING TO FILE
+    //sem wait will wait until filealock is available and grab it
+    sem_wait(&filealock);
+    
+    BidItem temp = readfa(ID);
+    
+    //TODO
+    //Convert BidItem to SoldItem with input from client
+    //Write new item to file B
+    
+    
+    //END CRITICAL SECTION
+    //sem post releases the filealock
+    sem_post(&fileblock);
+}
 int main()
 {
     //This opens and closes file to ensure westart with a blank file everytime
