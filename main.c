@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include "server.h"
 #include <semaphore.h>
-#include <client.h>
 
 //semaphores for file a and b write access
 sem_t filealock;
@@ -28,7 +27,7 @@ int main(int argc, char const *argv[]){
     }
     
     //starts Client for testing
-    clientMain();
+    //clientMain();
     
     for(int i = 0; i < 4; i++)
     {

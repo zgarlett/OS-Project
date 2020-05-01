@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 void connectToServer();
 
-int clientMain(int argc, char const *argv[]){
+int main(int argc, char const *argv[]){
 
     connectToServer();
 
@@ -54,9 +54,9 @@ void connectToServer(){
     //Send and receive loop
     while(1){
         printf("Input: \t");
-        scanf("%s", &buffer[0]);
+        scanf("%s", buffer);
         send(clientSocket, buffer, strlen(buffer), 0);
-
+        bzero(buffer, sizeof(buffer));
         //When we send out exit, we go ahead and close the socket and exit, server will respond and close its connection with the client as well.
         if(strcmp(buffer, "exit") == 0){
             close(clientSocket);
