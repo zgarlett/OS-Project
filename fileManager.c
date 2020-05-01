@@ -342,6 +342,11 @@ int Bget_item_by_sellerID(int sellerID){
 //removes an item from FILE_B by its itemID
 void Sremove_item(int itemID){
 	SoldItem item[100];
+	
+//CRITICAL SECTION WRITING TO FILE
+    //sem wait will wait until filealock is available and grab it
+    sem_wait(&fileblock);
+	
 	FILE *fp;
 	fp = fopen("FILE_B.bin", "ab+");
     FILE *fpreplace;
@@ -375,10 +380,19 @@ void Sremove_item(int itemID){
         }
         //Rename new file to match
         rename("FILE_B_Temporary.bin", "FILE_B.bin");
+	
+//END CRITICAL SECTION
+    //sem post releases the filealock
+    sem_post(&fileblock);
 }
 //removes an item by its itemID in FILE_A
 void Bremove_item(int itemID){
 	BidItem item[100];
+	
+//CRITICAL SECTION WRITING TO FILE
+    //sem wait will wait until filealock is available and grab it
+    sem_wait(&filealock);
+	
 	FILE *fp;
 	fp = fopen("FILE_A.bin", "ab+");
     FILE *fpreplace;
@@ -412,6 +426,10 @@ void Bremove_item(int itemID){
         }
         //Rename new file to match
         rename("FILE_A_Temporary.bin", "FILE_A.bin");
+	
+	//END CRITICAL SECTION
+    //sem post releases the filealock
+    sem_post(&filealock);
 }
 /*
 void testCreate()
