@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 void connectToServer();
 
-int main(int argc, char const *argv[]){
+int clientMain(int argc, char const *argv[]){
 
     connectToServer();
 
