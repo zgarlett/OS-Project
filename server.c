@@ -28,7 +28,7 @@
 #define MAX_MSG_SIZE 256
 #define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
 #define MAX 9000
-//Not sure what these are for at the moment, these I had to add to fix compiler errors.
+//For server-to-server communication in mqueue, sendMessageToServers(), checkRecievedMessage()
 #define BID_MADE "bid_made"
 #define AUCTION_END "auction_end"
 #define ITEM_ADDED "item_add"
